@@ -1,9 +1,125 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Teams
+Head-to-Head Analytics
 {% endblock %}
 
 {% block content %}
-<h1>Team Analysis</h1>
+
+<div class="page-header">
+    <h1>🤝 Head-to-Head Analytics</h1>
+    <p>Compare IPL teams based on historical matches.</p>
+</div>
+
+<div class="team-selector">
+
+    <label for="team1">Select Team 1</label>
+
+    <select id="team1">
+        <option>Chennai Super Kings</option>
+        <option>Mumbai Indians</option>
+        <option>Royal Challengers Bengaluru</option>
+        <option>Kolkata Knight Riders</option>
+        <option>Sunrisers Hyderabad</option>
+        <option>Delhi Capitals</option>
+        <option>Punjab Kings</option>
+        <option>Rajasthan Royals</option>
+        <option>Lucknow Super Giants</option>
+        <option>Gujarat Titans</option>
+    </select>
+
+    <br><br>
+
+    <label for="team2">Select Team 2</label>
+
+    <select id="team2">
+        <option>Mumbai Indians</option>
+        <option>Chennai Super Kings</option>
+        <option>Royal Challengers Bengaluru</option>
+        <option>Kolkata Knight Riders</option>
+        <option>Sunrisers Hyderabad</option>
+        <option>Delhi Capitals</option>
+        <option>Punjab Kings</option>
+        <option>Rajasthan Royals</option>
+        <option>Lucknow Super Giants</option>
+        <option>Gujarat Titans</option>
+    </select>
+
+</div>
+
+<div class="team-kpi-grid">
+
+    <div class="card">
+        <h2>38</h2>
+        <p>Total Matches</p>
+    </div>
+
+    <div class="card">
+        <h2>17</h2>
+        <p>Team 1 Wins</p>
+    </div>
+
+    <div class="card">
+        <h2>21</h2>
+        <p>Team 2 Wins</p>
+    </div>
+
+    <div class="card">
+        <h2>55%</h2>
+        <p>Team 2 Win %</p>
+    </div>
+
+</div>
+
+<div class="card">
+
+    <h2>Head-to-Head Summary</h2>
+
+    <p><strong>Highest Score:</strong> 235</p>
+    <p><strong>Lowest Score:</strong> 79</p>
+    <p><strong>Biggest Victory:</strong> 98 Runs</p>
+    <p><strong>Most Recent Winner:</strong> Chennai Super Kings</p>
+
+</div>
+
+<div class="card">
+
+    <h2>Recent Meetings</h2>
+
+    <table class="season-table">
+
+        <thead>
+            <tr>
+                <th>Season</th>
+                <th>Winner</th>
+                <th>Margin</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td>2025</td>
+                <td>CSK</td>
+                <td>5 Wickets</td>
+            </tr>
+
+            <tr>
+                <td>2024</td>
+                <td>MI</td>
+                <td>12 Runs</td>
+            </tr>
+
+            <tr>
+                <td>2023</td>
+                <td>CSK</td>
+                <td>7 Wickets</td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
 {% endblock %}

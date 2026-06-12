@@ -18,9 +18,9 @@ def players():
 def h2h():
     return render_template('h2h.html')
 
-@app.route('/predictor')
-def predictor():
-    return render_template('predictor.html')
+@app.route('/match-insights')
+def match_insights():
+    return render_template('match_insights.html')
 
 @app.route('/about')
 def about():
