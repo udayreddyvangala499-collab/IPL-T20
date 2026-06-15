@@ -7,65 +7,72 @@ Home
 {% block content %}
 
 <section class="hero">
-    <h1>IPL Analytics Dashboard</h1>
+    <h1>🏏 IPL Analytics Dashboard</h1>
     <p>
-        Analyze IPL teams, players, venues and predict match outcomes using machine learning.
+        Explore IPL team performance, player statistics,
+        head-to-head records, and AI-powered match insights.
     </p>
 </section>
 
 <section class="kpi-grid">
 
     <div class="card">
-        <h2>1095</h2>
+        <h2>{{ stats.matches }}</h2>
         <p>Total Matches</p>
     </div>
 
     <div class="card">
-        <h2>10</h2>
+        <h2>{{ stats.teams }}</h2>
         <p>Total Teams</p>
     </div>
 
     <div class="card">
-        <h2>800+</h2>
+        <h2>{{ stats.players }}</h2>
         <p>Total Players</p>
     </div>
 
     <div class="card">
-        <h2>18</h2>
-        <p>Seasons</p>
+        <h2>{{ stats.seasons }}</h2>
+        <p>Total Seasons</p>
     </div>
 
     <div class="card">
-        <h2>35</h2>
-        <p>Venues</p>
-    </div>
-
-    <div class="card">
-        <h2>350K+</h2>
+        <h2>{{ stats.runs }}</h2>
         <p>Total Runs</p>
     </div>
 
     <div class="card">
-        <h2>18K+</h2>
+        <h2>{{ stats.wickets }}</h2>
         <p>Total Wickets</p>
     </div>
 
-    <div class="card">
-        <h2>ML</h2>
-        <p>Match Prediction</p>
-    </div>
+    
 
 </section>
 
 <section class="insights">
 
-    <h2>Quick Insights</h2>
+    <h2>Project Overview</h2>
+
+    <p>
+        IPL Analytics Dashboard is a data-driven platform designed
+        to analyze team performance, player statistics, venue trends,
+        head-to-head records, and AI-powered match insights using
+        historical IPL data.
+    </p>
+
+</section>
+
+<section class="insights">
+
+    <h2>Modules Available</h2>
 
     <ul>
-        <li>🏆 Most Successful Team</li>
-        <li>🟠 Orange Cap Leader</li>
-        <li>🟣 Purple Cap Leader</li>
-        <li>📈 Best Venue Statistics</li>
+        <li>🏏 Team Analytics</li>
+        <li>👤 Player Analytics</li>
+        <li>🤝 Head-to-Head Analytics</li>
+        <li>🎯 Match Insights</li>
+        <li>ℹ️ About Project</li>
     </ul>
 
 </section>
