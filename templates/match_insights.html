@@ -1,209 +1,148 @@
-{% extends 'base.html' %}
-
-{% block title %}
-Match Insights
-{% endblock %}
+{% extends "base.html" %}
 
 {% block content %}
 
-<div class="page-header">
-    <h1>🎯 IPL Match Insights</h1>
-    <p>
-        AI-powered insights and win probability analysis based on historical IPL data.
-    </p>
-</div>
+<h1>📈 Match Insights</h1>
 
-<!-- Match Input Section -->
+<form method="POST">
 
-<div class="team-selector">
+    <select name="season">
 
-    <label>Team 1</label>
-    <select>
-        <option>Chennai Super Kings</option>
-        <option>Mumbai Indians</option>
-        <option>Royal Challengers Bengaluru</option>
-        <option>Kolkata Knight Riders</option>
-        <option>Sunrisers Hyderabad</option>
-        <option>Delhi Capitals</option>
-        <option>Punjab Kings</option>
-        <option>Rajasthan Royals</option>
-        <option>Lucknow Super Giants</option>
-        <option>Gujarat Titans</option>
+        {% for season in seasons %}
+        <option value="{{ season }}">
+            {{ season }}
+        </option>
+        {% endfor %}
+
     </select>
 
-    <br><br>
-
-    <label>Team 2</label>
-    <select>
-        <option>Mumbai Indians</option>
-        <option>Chennai Super Kings</option>
-        <option>Royal Challengers Bengaluru</option>
-        <option>Kolkata Knight Riders</option>
-        <option>Sunrisers Hyderabad</option>
-        <option>Delhi Capitals</option>
-        <option>Punjab Kings</option>
-        <option>Rajasthan Royals</option>
-        <option>Lucknow Super Giants</option>
-        <option>Gujarat Titans</option>
-    </select>
-
-    <br><br>
-
-  <label>Venue</label>
-
-<select>
-    <option>Wankhede Stadium, Mumbai</option>
-    <option>M. A. Chidambaram Stadium, Chennai</option>
-    <option>Eden Gardens, Kolkata</option>
-    <option>Narendra Modi Stadium, Ahmedabad</option>
-    <option>Rajiv Gandhi International Stadium, Hyderabad</option>
-    <option>Arun Jaitley Stadium, Delhi</option>
-    <option>Sawai Mansingh Stadium, Jaipur</option>
-    <option>Punjab Cricket Association Stadium, Mohali</option>
-    <option>M. Chinnaswamy Stadium, Bengaluru</option>
-    <option>BRSABV Ekana Cricket Stadium, Lucknow</option>
-    <option>Dr DY Patil Sports Academy, Navi Mumbai</option>
-    <option>Brabourne Stadium, Mumbai</option>
-    <option>Maharashtra Cricket Association Stadium, Pune</option>
-    <option>Dr. Y.S. Rajasekhara Reddy ACA-VDCA Stadium, Visakhapatnam</option>
-    <option>Barabati Stadium, Cuttack</option>
-    <option>Green Park Stadium, Kanpur</option>
-    <option>Holkar Cricket Stadium, Indore</option>
-    <option>Himachal Pradesh Cricket Association Stadium, Dharamshala</option>
-    <option>Shaheed Veer Narayan Singh Stadium, Raipur</option>
-    <option>JSCA International Stadium Complex, Ranchi</option>
-    <option>Buffalo Park, East London</option>
-    <option>Kingsmead, Durban</option>
-    <option>New Wanderers Stadium, Johannesburg</option>
-    <option>SuperSport Park, Centurion</option>
-    <option>St George's Park, Gqeberha</option>
-    <option>Newlands, Cape Town</option>
-    <option>De Beers Diamond Oval, Kimberley</option>
-    <option>OUTsurance Oval, Bloemfontein</option>
-    <option>Sheikh Zayed Stadium, Abu Dhabi</option>
-    <option>Dubai International Cricket Stadium, Dubai</option>
-    <option>Sharjah Cricket Stadium, Sharjah</option>
-</select>
-
-    <br><br>
-
-    <label>Toss Winner</label>
-    <select>
-        <option>Team 1</option>
-        <option>Team 2</option>
-    </select>
-
-    <br><br>
-
-    <label>Toss Decision</label>
-    <select>
-        <option>Bat</option>
-        <option>Field</option>
-    </select>
-
-    <br><br>
-
-    <button class="predict-btn">
-        Generate Insights
+    <button type="submit">
+        Analyze
     </button>
 
-</div>
+</form>
 
-<!-- Win Probability -->
+{% if stats %}
+
+<h2>🏆 Season Overview</h2>
+
+<div class="card">
+    <p><strong>Matches:</strong> {{ stats.matches }}</p>
+    <p><strong>Runs:</strong> {{ stats.runs }}</p>
+    <p><strong>Wickets:</strong> {{ stats.wickets }}</p>
+</div>
 
 <div class="card">
 
-    <h2>Win Probability</h2>
-
-    <p><strong>Chennai Super Kings:</strong> 62%</p>
-
-    <p><strong>Mumbai Indians:</strong> 38%</p>
-
-</div>
-
-<!-- Confidence -->
-
-<div class="card">
-
-    <h2>Confidence Level</h2>
-
-    <p>Model Confidence: 72%</p>
-
-</div>
-
-<!-- Key Factors -->
-
-<div class="card">
-
-    <h2>Key Factors Influencing Outcome</h2>
-
-    <ul>
-        <li>Recent Team Form</li>
-        <li>Venue Performance</li>
-        <li>Toss Impact</li>
-        <li>Head-to-Head Record</li>
-        <li>Batting Strength</li>
-        <li>Bowling Efficiency</li>
-    </ul>
-
-</div>
-
-<!-- Match Outlook -->
-
-<div class="card">
-
-    <h2>Match Outlook</h2>
+    <h2>🏏 Batting Leaders</h2>
 
     <p>
-        Based on historical IPL data and selected match conditions,
-        Team A currently holds a slight advantage. However, both teams
-        remain competitive and the outcome may vary depending on
-        player performance and match-day conditions.
+        {{ season_performers.top_batter }}
+        ({{ season_performers.top_runs }} Runs)
+    </p>
+
+    <p>
+        {{ season_performers.most_sixes_player }}
+        ({{ season_performers.most_sixes }} Sixes)
     </p>
 
 </div>
 
-<!-- Historical Comparison -->
-
 <div class="card">
 
-    <h2>Historical Comparison</h2>
-
-    <p><strong>Total Meetings:</strong> 38</p>
-
-    <p><strong>Team A Wins:</strong> 17</p>
-
-    <p><strong>Team B Wins:</strong> 21</p>
-
-</div>
-
-<!-- Model Information -->
-
-<div class="card">
-
-    <h2>Model Information</h2>
-
-    <p><strong>Algorithm:</strong> Random Forest</p>
-
-    <p><strong>Training Dataset:</strong> IPL Historical Data (2008–2025)</p>
-
-    <p><strong>Purpose:</strong> Win Probability Estimation</p>
-
-</div>
-
-<!-- Disclaimer -->
-
-<div class="card">
-
-    <h2>Disclaimer</h2>
+    <h2>🎯 Bowling Leaders</h2>
 
     <p>
-        The insights displayed are generated using machine learning
-        models trained on historical IPL data. Actual match outcomes
-        may differ due to player form, weather conditions, injuries,
-        team strategy, and other real-time factors.
+        {{ season_performers.top_bowler }}
+        ({{ season_performers.top_wickets }} Wickets)
     </p>
 
 </div>
+
+<div class="card">
+
+    <h2>🧤 Fielding Leaders</h2>
+
+    <p>
+        {{ season_performers.top_fielder }}
+        ({{ season_performers.top_catches }} Catches)
+    </p>
+
+</div>
+
+<hr>
+
+<form method="POST">
+
+    <input
+        type="hidden"
+        name="season"
+        value="{{ selected_season }}"
+    >
+
+    <select name="team">
+
+        {% for team in stats.teams %}
+        <option value="{{ team }}">
+            {{ team }}
+        </option>
+        {% endfor %}
+
+    </select>
+
+    <button type="submit">
+        Analyze Team
+    </button>
+
+</form>
+
+{% endif %}
+
+{% if team_stats %}
+
+<h2>🏏 Team Insights</h2>
+
+<div class="card">
+    <p><strong>Matches:</strong> {{ team_stats.matches }}</p>
+    <p><strong>Wins:</strong> {{ team_stats.wins }}</p>
+    <p><strong>Losses:</strong> {{ team_stats.losses }}</p>
+    <p><strong>Runs:</strong> {{ team_stats.runs }}</p>
+    <p><strong>Wickets:</strong> {{ team_stats.wickets }}</p>
+</div>
+
+<div class="card">
+
+    <h2>🏏 Team Batting Leader</h2>
+
+    <p>
+        {{ team_performers.top_batter }}
+        ({{ team_performers.top_runs }} Runs)
+    </p>
+
+</div>
+
+<div class="card">
+
+    <h2>🎯 Team Bowling Leader</h2>
+
+    <p>
+        {{ team_performers.top_bowler }}
+        ({{ team_performers.top_wickets }} Wickets)
+    </p>
+
+</div>
+
+<div class="card">
+
+    <h2>🧤 Team Fielding Leader</h2>
+
+    <p>
+        {{ team_performers.top_fielder }}
+        ({{ team_performers.top_catches }} Catches)
+    </p>
+
+</div>
+
+{% endif %}
 
 {% endblock %}

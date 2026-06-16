@@ -94,6 +94,11 @@ sys.path.append(
 
 # from utils.team_analytics import get_team_stats
 
-from utils.team_analytics import get_team_stats
+# from utils.team_analytics import get_team_stats
 
-print(get_team_stats("Mumbai Indians"))
+# print(get_team_stats("Mumbai Indians"))
+
+
+from utils.players_analytics import get_player_stats
+
+print(get_player_stats("V Kohli"))

@@ -1,125 +1,171 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Head-to-Head Analytics
+Head To Head Analytics
 {% endblock %}
 
 {% block content %}
 
 <div class="page-header">
-    <h1>🤝 Head-to-Head Analytics</h1>
-    <p>Compare IPL teams based on historical matches.</p>
+    <h1>🤝 Head To Head Analytics</h1>
 </div>
 
-<div class="team-selector">
+<form method="POST">
 
-    <label for="team1">Select Team 1</label>
-
-    <select id="team1">
-        <option>Chennai Super Kings</option>
-        <option>Mumbai Indians</option>
-        <option>Royal Challengers Bengaluru</option>
-        <option>Kolkata Knight Riders</option>
-        <option>Sunrisers Hyderabad</option>
-        <option>Delhi Capitals</option>
-        <option>Punjab Kings</option>
-        <option>Rajasthan Royals</option>
-        <option>Lucknow Super Giants</option>
-        <option>Gujarat Titans</option>
+    <select name="team1">
+        {% for team in teams %}
+        <option value="{{ team }}"
+        {% if team == team1 %}selected{% endif %}>
+            {{ team }}
+        </option>
+        {% endfor %}
     </select>
 
-    <br><br>
-
-    <label for="team2">Select Team 2</label>
-
-    <select id="team2">
-        <option>Mumbai Indians</option>
-        <option>Chennai Super Kings</option>
-        <option>Royal Challengers Bengaluru</option>
-        <option>Kolkata Knight Riders</option>
-        <option>Sunrisers Hyderabad</option>
-        <option>Delhi Capitals</option>
-        <option>Punjab Kings</option>
-        <option>Rajasthan Royals</option>
-        <option>Lucknow Super Giants</option>
-        <option>Gujarat Titans</option>
+    <select name="team2">
+        {% for team in teams %}
+        <option value="{{ team }}"
+        {% if team == team2 %}selected{% endif %}>
+            {{ team }}
+        </option>
+        {% endfor %}
     </select>
 
-</div>
+    <button type="submit">
+        Analyze
+    </button>
+
+</form>
+
+{% if overall_stats %}
+
+<hr>
+
+<h2>🏆 Overall Rivalry</h2>
 
 <div class="team-kpi-grid">
 
     <div class="card">
-        <h2>38</h2>
-        <p>Total Matches</p>
+        <h2>{{ overall_stats.matches }}</h2>
+        <p>Matches</p>
     </div>
 
     <div class="card">
-        <h2>17</h2>
-        <p>Team 1 Wins</p>
+        <h2>{{ overall_stats.team1_wins }}</h2>
+        <p>{{ team1 }} Wins</p>
     </div>
 
     <div class="card">
-        <h2>21</h2>
-        <p>Team 2 Wins</p>
+        <h2>{{ overall_stats.team2_wins }}</h2>
+        <p>{{ team2 }} Wins</p>
     </div>
 
     <div class="card">
-        <h2>55%</h2>
-        <p>Team 2 Win %</p>
+        <h2>{{ overall_stats.team1_win_pct }}%</h2>
+        <p>{{ team1 }} Win %</p>
     </div>
 
 </div>
 
 <div class="card">
 
-    <h2>Head-to-Head Summary</h2>
+    <p><strong>Highest Score:</strong>
+        {{ overall_stats.highest_score }}
+    </p>
 
-    <p><strong>Highest Score:</strong> 235</p>
-    <p><strong>Lowest Score:</strong> 79</p>
-    <p><strong>Biggest Victory:</strong> 98 Runs</p>
-    <p><strong>Most Recent Winner:</strong> Chennai Super Kings</p>
+    <p><strong>Lowest Score:</strong>
+        {{ overall_stats.lowest_score }}
+    </p>
+
+    <p><strong>Recent Winner:</strong>
+        {{ overall_stats.recent_winner }}
+    </p>
+
+</div>
+
+<hr>
+
+<h2>🏟 Venue Rivalry</h2>
+
+<form method="POST">
+
+    <input type="hidden"
+           name="team1"
+           value="{{ team1 }}">
+
+    <input type="hidden"
+           name="team2"
+           value="{{ team2 }}">
+
+    <select name="venue">
+
+        <option value="All">
+            Select Venue
+        </option>
+
+        {% for venue in overall_stats.venues %}
+        <option value="{{ venue }}"
+        {% if venue == selected_venue %}
+        selected
+        {% endif %}
+        >
+            {{ venue }}
+        </option>
+        {% endfor %}
+
+    </select>
+
+    <button type="submit">
+        Apply Filter
+    </button>
+
+</form>
+
+{% endif %}
+
+{% if venue_stats %}
+
+<div class="team-kpi-grid">
+
+    <div class="card">
+        <h2>{{ venue_stats.matches }}</h2>
+        <p>Matches</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ venue_stats.team1_wins }}</h2>
+        <p>{{ team1 }} Wins</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ venue_stats.team2_wins }}</h2>
+        <p>{{ team2 }} Wins</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ venue_stats.team1_win_pct }}%</h2>
+        <p>{{ team1 }} Win %</p>
+    </div>
 
 </div>
 
 <div class="card">
 
-    <h2>Recent Meetings</h2>
+    <h3>{{ selected_venue }}</h3>
 
-    <table class="season-table">
+    <p><strong>Highest Score:</strong>
+        {{ venue_stats.highest_score }}
+    </p>
 
-        <thead>
-            <tr>
-                <th>Season</th>
-                <th>Winner</th>
-                <th>Margin</th>
-            </tr>
-        </thead>
+    <p><strong>Lowest Score:</strong>
+        {{ venue_stats.lowest_score }}
+    </p>
 
-        <tbody>
-
-            <tr>
-                <td>2025</td>
-                <td>CSK</td>
-                <td>5 Wickets</td>
-            </tr>
-
-            <tr>
-                <td>2024</td>
-                <td>MI</td>
-                <td>12 Runs</td>
-            </tr>
-
-            <tr>
-                <td>2023</td>
-                <td>CSK</td>
-                <td>7 Wickets</td>
-            </tr>
-
-        </tbody>
-
-    </table>
+    <p><strong>Recent Winner:</strong>
+        {{ venue_stats.recent_winner }}
+    </p>
 
 </div>
+
+{% endif %}
 
 {% endblock %}

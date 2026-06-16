@@ -1,53 +1,151 @@
 {% extends "base.html" %}
 
+{% block title %}
+Team Analytics
+{% endblock %}
+
 {% block content %}
 
-<h1>Team Analytics</h1>
+<h1>🏏 Team Analytics</h1>
 
 <form method="POST">
+
     <select name="team">
+
         {% for team in teams %}
-        <option value="{{ team }}">
+        <option value="{{ team }}"
+        {% if team == selected_team %}
+        selected
+        {% endif %}
+        >
             {{ team }}
         </option>
         {% endfor %}
+
     </select>
 
     <button type="submit">
         Analyze
     </button>
+
 </form>
 
 {% if stats %}
 
-<div class="card">
-    <h2>{{ stats.matches }}</h2>
-    <p>Matches Played</p>
+<h2>📊 Overall Team Analysis</h2>
+
+<div class="team-kpi-grid">
+
+    <div class="card">
+        <h2>{{ stats.matches }}</h2>
+        <p>Matches</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ stats.wins }}</h2>
+        <p>Wins</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ stats.losses }}</h2>
+        <p>Losses</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ stats.win_percentage }}%</h2>
+        <p>Win %</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ stats.runs }}</h2>
+        <p>Total Runs</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ stats.wickets }}</h2>
+        <p>Total Wickets</p>
+    </div>
+
 </div>
 
-<div class="card">
-    <h2>{{ stats.wins }}</h2>
-    <p>Wins</p>
-</div>
+<hr>
 
-<div class="card">
-    <h2>{{ stats.losses }}</h2>
-    <p>Losses</p>
-</div>
+<h2>🏟 Venue Performance</h2>
 
-<div class="card">
-    <h2>{{ stats.win_percentage }}%</h2>
-    <p>Win Percentage</p>
-</div>
+<form method="POST">
 
-<div class="card">
-    <h2>{{ stats.runs }}</h2>
-    <p>Total Runs</p>
-</div>
+    <input
+        type="hidden"
+        name="team"
+        value="{{ selected_team }}"
+    >
 
-<div class="card">
-    <h2>{{ stats.wickets }}</h2>
-    <p>Total Wickets</p>
+    <select name="venue">
+
+        <option value="">
+            Select Venue
+        </option>
+
+        {% for venue in stats.venues %}
+
+        <option value="{{ venue }}"
+        {% if venue == selected_venue %}
+        selected
+        {% endif %}
+        >
+            {{ venue }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <button type="submit">
+        Apply Filter
+    </button>
+
+</form>
+
+{% endif %}
+
+{% if venue_stats %}
+
+<hr>
+
+<h2>🏟 {{ selected_venue }}</h2>
+
+<div class="team-kpi-grid">
+
+    <div class="card">
+        <h2>{{ venue_stats.matches }}</h2>
+        <p>Matches</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ venue_stats.wins }}</h2>
+        <p>Wins</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ venue_stats.losses }}</h2>
+        <p>Losses</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ venue_stats.win_percentage }}%</h2>
+        <p>Win %</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ venue_stats.runs }}</h2>
+        <p>Total Runs</p>
+    </div>
+
+    <div class="card">
+        <h2>{{ venue_stats.wickets }}</h2>
+        <p>Total Wickets</p>
+    </div>
+
 </div>
 
 {% endif %}
