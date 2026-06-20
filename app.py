@@ -1,218 +1,193 @@
 from flask import Flask, render_template
 
 app = Flask(__name__)
-from utils.home_stats import get_home_stats
 
-from flask import request
-from utils.team_analytics import get_teams, get_team_stats
 
-from utils.players_analytics import get_players, get_player_stats
-from utils.h2h_analytics import (
-    get_teams,
-    get_h2h_stats
-)
-from utils.match_insights import (
-    get_seasons,
-    get_season_stats,
-    get_season_top_performers,
-    get_team_season_stats,
-    get_team_top_performers
-)
-
-@app.route('/')
+@app.route("/")
 def home():
-    stats = get_home_stats()
-    print(stats)
-    return render_template('index.html', stats=stats)
-# @app.route('/')
-# def home():
-#     return render_template('index.html')
-from utils.team_analytics import (
-    get_teams,
-    get_team_stats,
-    get_team_venue_stats
-)
 
-@app.route('/teams', methods=['GET', 'POST'])
+    teams = [
+        {"name": "Chennai Super Kings", "logo": "CSK.png"},
+        {"name": "Mumbai Indians", "logo": "MI.jpg"},
+        {"name": "Royal Challengers Bengaluru", "logo": "RCB.jpg"},
+        {"name": "Kolkata Knight Riders", "logo": "KKR.png"}
+    ]
+
+    winners = [
+        {"year": 2025, "team": "Royal Challengers Bengaluru", "logo": "RCB.jpg"},
+        {"year": 2024, "team": "Kolkata Knight Riders", "logo": "KKR.png"},
+        {"year": 2023, "team": "Chennai Super Kings", "logo": "CSK.png"},
+        {"year": 2022, "team": "Gujarat Titans", "logo": "GT.jpg"}
+    ]
+
+    return render_template(
+        "index.html",
+        teams=teams,
+        winners=winners,
+        total_matches=1095,
+        total_players=900,
+        total_venues=50,
+        total_seasons=18
+    )
+
+
+@app.route("/teams")
 def teams():
 
-    teams = get_teams()
+    teams = [
+        {
+            "code": "CSK",
+            "name": "Chennai Super Kings",
+            "logo": "CSK.png"
+        },
+        {
+            "code": "MI",
+            "name": "Mumbai Indians",
+            "logo": "MI.jpg"
+        },
+        {
+            "code": "RCB",
+            "name": "Royal Challengers Bengaluru",
+            "logo": "RCB.jpg"
+        },
+        {
+            "code": "KKR",
+            "name": "Kolkata Knight Riders",
+            "logo": "KKR.png"
+        },
+        {
+            "code": "SRH",
+            "name": "Sunrisers Hyderabad",
+            "logo": "SRH.png"
+        },
+        {
+            "code": "RR",
+            "name": "Rajasthan Royals",
+            "logo": "RR.jpg"
+        },
+        {
+            "code": "DC",
+            "name": "Delhi Capitals",
+            "logo": "DC.png"
+        },
+        {
+            "code": "PBKS",
+            "name": "Punjab Kings",
+            "logo": "PBKS.jpg"
+        },
+        {
+            "code": "LSG",
+            "name": "Lucknow Super Giants",
+            "logo": "LSG.jpg"
+        },
+        {
+            "code": "GT",
+            "name": "Gujarat Titans",
+            "logo": "GT.jpg"
+        }
+    ]
 
-    stats = None
-    venue_stats = None
+    team_data = {
 
-    selected_team = None
-    selected_venue = None
+        "code": "CSK",
+        "name": "Chennai Super Kings",
+        "logo": "CSK.png",
+        "established": "2008",
 
-    if request.method == "POST":
+        "matches": 234,
+        "wins": 140,
+        "losses": 90,
+        "win_pct": 59.83,
 
-        selected_team = request.form["team"]
+        "bat_avg": 29.42,
+        "strike_rate": 137.25,
+        "bowl_avg": 26.18,
+        "economy": 8.35,
+        "fielding_pct": 84.67,
 
-        stats = get_team_stats(selected_team)
+        "recent_match": {
+            "team_score": "215/7",
+            "opp_score": "137/9",
+            "opponent": "DC",
+            "opp_logo": "DC.png",
+            "result": "Won by 78 Runs"
+        },
 
-        selected_venue = request.form.get("venue")
+        "records": {
+            "highest_total": "246/5",
+            "lowest_total": "79/10",
+            "most_runs": "6243",
+            "best_bowling": "5/18",
+            "most_wickets": "140"
+        },
 
-        if selected_venue:
+        "batting": {
 
-            venue_stats = get_team_venue_stats(
-                selected_team,
-                selected_venue
-            )
+            "players": [
+                "Ruturaj Gaikwad",
+                "Shivam Dube",
+                "Rachin Ravindra",
+                "MS Dhoni",
+                "R Jadeja"
+            ],
+
+            "runs": [583, 396, 222, 161, 255],
+            "average": [53.0, 38.2, 35.1, 40.2, 28.3],
+            "strike_rate": [145, 162, 141, 220, 136],
+            "fifties": [4, 2, 1, 0, 1],
+            "hundreds": [1, 0, 0, 0, 0],
+            "fours": [58, 32, 24, 12, 18],
+            "sixes": [24, 28, 10, 12, 9]
+
+        },
+
+        "bowling": {
+
+            "players": [
+                "Pathirana",
+                "Mustafizur",
+                "Jadeja",
+                "Theekshana",
+                "Chahar"
+            ],
+
+            "wickets": [19, 14, 12, 11, 10],
+            "average": [18.2, 22.1, 24.5, 26.1, 28.2],
+            "economy": [7.8, 8.0, 7.4, 8.2, 8.5],
+            "strike_rate": [13.4, 16.8, 18.5, 19.2, 20.4],
+            "maidens": [1, 0, 1, 0, 0],
+            "four_wickets": [2, 1, 0, 0, 0],
+            "five_wickets": [1, 0, 0, 0, 0]
+
+        }
+    }
 
     return render_template(
         "teams.html",
         teams=teams,
-        stats=stats,
-        venue_stats=venue_stats,
-        selected_team=selected_team,
-        selected_venue=selected_venue
+        team_data=team_data
     )
-from utils.players_analytics import get_players, get_player_stats
 
-@app.route('/players', methods=['GET', 'POST'])
+
+@app.route("/players")
 def players():
+    return "<h1>Players Page Coming Soon</h1>"
 
-    players = get_players()
 
-    stats = None
-    selected_player = None
-
-    if request.method == 'POST':
-
-        selected_player = request.form['player']
-
-        # Case-insensitive search
-        player_map = {
-            p.lower(): p
-            for p in players
-        }
-
-        actual_player = player_map.get(
-            selected_player.lower()
-        )
-
-        if actual_player:
-            stats = get_player_stats(actual_player)
-
-    return render_template(
-        'players.html',
-        players=players,
-        stats=stats,
-        selected_player=selected_player
-    )
-from utils.h2h_analytics import (
-    get_teams,
-    get_h2h_stats
-)
-
-@app.route('/h2h', methods=['GET', 'POST'])
+@app.route("/h2h")
 def h2h():
+    return "<h1>Head-to-Head Analytics Coming Soon</h1>"
 
-    teams = get_teams()
 
-    overall_stats = None
-    venue_stats = None
-
-    team1 = None
-    team2 = None
-
-    selected_venue = "All"
-
-    if request.method == 'POST':
-
-        team1 = request.form['team1']
-        team2 = request.form['team2']
-
-        selected_venue = request.form.get(
-            'venue',
-            'All'
-        )
-
-        overall_stats = get_h2h_stats(
-            team1,
-            team2
-        )
-
-        if selected_venue != "All":
-
-            venue_stats = get_h2h_stats(
-                team1,
-                team2,
-                selected_venue
-            )
-
-    return render_template(
-        "h2h.html",
-        teams=teams,
-        overall_stats=overall_stats,
-        venue_stats=venue_stats,
-        team1=team1,
-        team2=team2,
-        selected_venue=selected_venue
-    )
-from utils.match_insights import (
-    get_seasons,
-    get_season_stats,
-    get_season_top_performers,
-    get_team_season_stats,
-    get_team_top_performers
-)
-
-@app.route('/match-insights', methods=['GET', 'POST'])
+@app.route("/match-insights")
 def match_insights():
+    return "<h1>Match Insights Coming Soon</h1>"
 
-    seasons = get_seasons()
 
-    stats = None
-    season_performers = None
-
-    team_stats = None
-    team_performers = None
-
-    selected_season = None
-    selected_team = None
-
-    if request.method == "POST":
-
-        selected_season = request.form["season"]
-
-        stats = get_season_stats(
-            selected_season
-        )
-
-        season_performers = get_season_top_performers(
-            selected_season
-        )
-
-        selected_team = request.form.get(
-            "team"
-        )
-
-        if selected_team:
-
-            team_stats = get_team_season_stats(
-                selected_team,
-                selected_season
-            )
-
-            team_performers = get_team_top_performers(
-                selected_team,
-                selected_season
-            )
-
-    return render_template(
-        "match_insights.html",
-        seasons=seasons,
-        stats=stats,
-        season_performers=season_performers,
-        team_stats=team_stats,
-        team_performers=team_performers,
-        selected_season=selected_season,
-        selected_team=selected_team
-    )
-@app.route('/about')
+@app.route("/about")
 def about():
-    return render_template('about.html')
+    return "<h1>About Page Coming Soon</h1>"
+
 
 if __name__ == "__main__":
     app.run(debug=True)

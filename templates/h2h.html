@@ -1,171 +1,57 @@
-{% extends 'base.html' %}
-
-{% block title %}
-Head To Head Analytics
-{% endblock %}
+{% extends "base.html" %}
 
 {% block content %}
 
-<div class="page-header">
-    <h1>🤝 Head To Head Analytics</h1>
-</div>
+<section class="teams-hero">
 
-<form method="POST">
+    <div class="container-xl">
 
-    <select name="team1">
+        <span class="page-badge">
+            IPL Teams Analytics
+        </span>
+
+        <h1>
+            Explore IPL Teams
+        </h1>
+
+        <p>
+            Analyze team performance, winning percentage,
+            championships and historical records.
+        </p>
+
+    </div>
+
+</section>
+
+<section class="container-xl py-5">
+
+    <div class="row g-4">
+
         {% for team in teams %}
-        <option value="{{ team }}"
-        {% if team == team1 %}selected{% endif %}>
-            {{ team }}
-        </option>
-        {% endfor %}
-    </select>
 
-    <select name="team2">
-        {% for team in teams %}
-        <option value="{{ team }}"
-        {% if team == team2 %}selected{% endif %}>
-            {{ team }}
-        </option>
-        {% endfor %}
-    </select>
+        <div class="col-lg-3 col-md-4 col-sm-6">
 
-    <button type="submit">
-        Analyze
-    </button>
+            <div class="team-analytics-card">
 
-</form>
+                <img
+                    src="{{ url_for('static',
+                    filename='images/' + team.logo) }}"
+                    alt="{{ team.name }}">
 
-{% if overall_stats %}
+                <h5>{{ team.name }}</h5>
 
-<hr>
+                <a href="#" class="btn btn-primary">
+                    View Analytics
+                </a>
 
-<h2>🏆 Overall Rivalry</h2>
+            </div>
 
-<div class="team-kpi-grid">
+        </div>
 
-    <div class="card">
-        <h2>{{ overall_stats.matches }}</h2>
-        <p>Matches</p>
-    </div>
-
-    <div class="card">
-        <h2>{{ overall_stats.team1_wins }}</h2>
-        <p>{{ team1 }} Wins</p>
-    </div>
-
-    <div class="card">
-        <h2>{{ overall_stats.team2_wins }}</h2>
-        <p>{{ team2 }} Wins</p>
-    </div>
-
-    <div class="card">
-        <h2>{{ overall_stats.team1_win_pct }}%</h2>
-        <p>{{ team1 }} Win %</p>
-    </div>
-
-</div>
-
-<div class="card">
-
-    <p><strong>Highest Score:</strong>
-        {{ overall_stats.highest_score }}
-    </p>
-
-    <p><strong>Lowest Score:</strong>
-        {{ overall_stats.lowest_score }}
-    </p>
-
-    <p><strong>Recent Winner:</strong>
-        {{ overall_stats.recent_winner }}
-    </p>
-
-</div>
-
-<hr>
-
-<h2>🏟 Venue Rivalry</h2>
-
-<form method="POST">
-
-    <input type="hidden"
-           name="team1"
-           value="{{ team1 }}">
-
-    <input type="hidden"
-           name="team2"
-           value="{{ team2 }}">
-
-    <select name="venue">
-
-        <option value="All">
-            Select Venue
-        </option>
-
-        {% for venue in overall_stats.venues %}
-        <option value="{{ venue }}"
-        {% if venue == selected_venue %}
-        selected
-        {% endif %}
-        >
-            {{ venue }}
-        </option>
         {% endfor %}
 
-    </select>
-
-    <button type="submit">
-        Apply Filter
-    </button>
-
-</form>
-
-{% endif %}
-
-{% if venue_stats %}
-
-<div class="team-kpi-grid">
-
-    <div class="card">
-        <h2>{{ venue_stats.matches }}</h2>
-        <p>Matches</p>
     </div>
 
-    <div class="card">
-        <h2>{{ venue_stats.team1_wins }}</h2>
-        <p>{{ team1 }} Wins</p>
-    </div>
-
-    <div class="card">
-        <h2>{{ venue_stats.team2_wins }}</h2>
-        <p>{{ team2 }} Wins</p>
-    </div>
-
-    <div class="card">
-        <h2>{{ venue_stats.team1_win_pct }}%</h2>
-        <p>{{ team1 }} Win %</p>
-    </div>
-
-</div>
-
-<div class="card">
-
-    <h3>{{ selected_venue }}</h3>
-
-    <p><strong>Highest Score:</strong>
-        {{ venue_stats.highest_score }}
-    </p>
-
-    <p><strong>Lowest Score:</strong>
-        {{ venue_stats.lowest_score }}
-    </p>
-
-    <p><strong>Recent Winner:</strong>
-        {{ venue_stats.recent_winner }}
-    </p>
-
-</div>
-
-{% endif %}
+</section>
 
 {% endblock %}

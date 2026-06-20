@@ -1,79 +1,132 @@
-{% extends 'base.html' %}
-
-{% block title %}
-Home
-{% endblock %}
+{% extends "base.html" %}
 
 {% block content %}
 
+<!-- HERO SECTION -->
+
 <section class="hero">
-    <h1>🏏 IPL Analytics Dashboard</h1>
-    <p>
-        Explore IPL team performance, player statistics,
-        head-to-head records, and AI-powered match insights.
-    </p>
-</section>
 
-<section class="kpi-grid">
-
-    <div class="card">
-        <h2>{{ stats.matches }}</h2>
-        <p>Total Matches</p>
+    <div class="badge-custom">
+        Data • Insights • Performance
     </div>
 
-    <div class="card">
-        <h2>{{ stats.teams }}</h2>
-        <p>Total Teams</p>
-    </div>
-
-    <div class="card">
-        <h2>{{ stats.players }}</h2>
-        <p>Total Players</p>
-    </div>
-
-    <div class="card">
-        <h2>{{ stats.seasons }}</h2>
-        <p>Total Seasons</p>
-    </div>
-
-    <div class="card">
-        <h2>{{ stats.runs }}</h2>
-        <p>Total Runs</p>
-    </div>
-
-    <div class="card">
-        <h2>{{ stats.wickets }}</h2>
-        <p>Total Wickets</p>
-    </div>
-
-    
-
-</section>
-
-<section class="insights">
-
-    <h2>Project Overview</h2>
+    <h1>
+        The Smartest Way to Analyze
+        <span>IPL Teams, Players & Rivalries</span>
+    </h1>
 
     <p>
-        IPL Analytics Dashboard is a data-driven platform designed
-        to analyze team performance, player statistics, venue trends,
-        head-to-head records, and AI-powered match insights using
-        historical IPL data.
+        Explore IPL teams, player performances,
+        venue records, head-to-head rivalries and
+        season insights through one powerful platform.
     </p>
+
+    <div class="hero-buttons">
+
+        <button class="btn btn-primary btn-lg">
+            Explore Teams
+        </button>
+
+        <button class="btn btn-outline-primary btn-lg">
+            Analyze Players
+        </button>
+
+    </div>
 
 </section>
 
-<section class="insights">
+<!-- KPI STATS SECTION -->
 
-    <h2>Modules Available</h2>
+<section class="container-xl mt-5">
 
-    <ul>
-        <li>🏏 Team Analytics</li>
-        <li>👤 Player Analytics</li>
-        <li>🤝 Head-to-Head Analytics</li>
-        <li>🎯 Match Insights</li>
-        <li>ℹ️ About Project</li>
-    </ul>
+    <div class="stats-bar">
+
+        <div class="stat-item">
+            <div class="icon-circle">📊</div>
+            <div>
+                <h3>{{ total_matches }}+</h3>
+                <p>Matches</p>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="stat-item">
+            <div class="icon-circle">👥</div>
+            <div>
+                <h3>{{ total_players }}+</h3>
+                <p>Players</p>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="stat-item">
+            <div class="icon-circle">🏟️</div>
+            <div>
+                <h3>{{ total_venues }}+</h3>
+                <p>Venues</p>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="stat-item">
+            <div class="icon-circle">🏆</div>
+            <div>
+                <h3>{{ total_seasons }}</h3>
+                <p>Seasons</p>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- RECENT IPL CHAMPIONS -->
+
+<section class="container-xl mt-5 mb-5">
+
+    <div class="section-header">
+
+        <h2 class="section-title">
+            Recent IPL Champions
+        </h2>
+
+        <a href="#" class="view-all-link">
+            View All →
+        </a>
+
+    </div>
+
+    <div class="row g-4">
+
+        {% for winner in winners %}
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="winner-card">
+
+                <span class="season-badge">
+                    {{ winner.year }}
+                </span>
+
+                <img
+                    src="{{ url_for('static', filename='images/' + winner.logo) }}"
+                    alt="{{ winner.team }}">
+
+                <h5>{{ winner.team }}</h5>
+
+                <p>IPL Champion</p>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
 
 </section>
 

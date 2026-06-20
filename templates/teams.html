@@ -1,153 +1,343 @@
 {% extends "base.html" %}
 
-{% block title %}
-Team Analytics
-{% endblock %}
-
 {% block content %}
 
-<h1>🏏 Team Analytics</h1>
+<div class="teams-page">
 
-<form method="POST">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
 
-    <select name="team">
+        <div>
+            <h1>Teams Analytics</h1>
+            <p>Detailed performance analysis and statistics for all IPL teams</p>
+        </div>
 
-        {% for team in teams %}
-        <option value="{{ team }}"
-        {% if team == selected_team %}
-        selected
-        {% endif %}
-        >
-            {{ team }}
-        </option>
-        {% endfor %}
+        <div class="team-select">
+            <label class="form-label">Select Team</label>
 
-    </select>
+            <select class="form-select">
+                {% for team in teams %}
+                <option value="{{ team.code }}"
+                    {% if team.code == team_data.code %}selected{% endif %}>
+                    {{ team.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <button type="submit">
-        Analyze
-    </button>
-
-</form>
-
-{% if stats %}
-
-<h2>📊 Overall Team Analysis</h2>
-
-<div class="team-kpi-grid">
-
-    <div class="card">
-        <h2>{{ stats.matches }}</h2>
-        <p>Matches</p>
     </div>
 
-    <div class="card">
-        <h2>{{ stats.wins }}</h2>
-        <p>Wins</p>
+    <!-- MAIN LAYOUT -->
+    <div class="dashboard-layout">
+
+        <!-- LEFT SIDEBAR -->
+        <div class="left-column">
+
+            <div class="teams-sidebar">
+
+                <h4>All IPL Teams</h4>
+
+                <div class="teams-grid">
+
+                    {% for team in teams %}
+                    <div class="team-box">
+
+                        <img
+                            src="{{ url_for('static', filename='images/' + team.logo) }}"
+                            alt="{{ team.name }}">
+
+                        <div class="team-info">
+                            <h6>{{ team.code }}</h6>
+                            <p>{{ team.name }}</p>
+                        </div>
+
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT CONTENT -->
+        <div class="dashboard-content">
+
+            <!-- TEAM BANNER -->
+            <div class="team-banner">
+
+                <div class="banner-left">
+
+                    <img
+                        src="{{ url_for('static', filename='images/' + team_data.logo) }}"
+                        alt="{{ team_data.name }}">
+
+                    <div>
+
+                        <h2>{{ team_data.name }}</h2>
+
+                        <span class="team-tag">
+                            {{ team_data.code }}
+                        </span>
+
+                        <p>
+                            Established : {{ team_data.established }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="banner-stats">
+
+                    <div>
+                        <small>Matches Played</small>
+                        <h3>{{ team_data.matches }}</h3>
+                    </div>
+
+                    <div>
+                        <small>Wins</small>
+                        <h3>{{ team_data.wins }}</h3>
+                    </div>
+
+                    <div>
+                        <small>Losses</small>
+                        <h3>{{ team_data.losses }}</h3>
+                    </div>
+
+                    <div>
+                        <small>Win %</small>
+                        <h3>{{ team_data.win_pct }}%</h3>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- KPI GRID -->
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+                    <h6>Batting Average</h6>
+                    <h3>{{ team_data.bat_avg }}</h3>
+                    <small>Overall Average</small>
+                </div>
+
+                <div class="kpi-card">
+                    <h6>Strike Rate</h6>
+                    <h3>{{ team_data.strike_rate }}</h3>
+                    <small>Overall Strike Rate</small>
+                </div>
+
+                <div class="kpi-card">
+                    <h6>Bowling Average</h6>
+                    <h3>{{ team_data.bowl_avg }}</h3>
+                    <small>Overall Average</small>
+                </div>
+
+                <div class="kpi-card">
+                    <h6>Economy Rate</h6>
+                    <h3>{{ team_data.economy }}</h3>
+                    <small>Overall Economy</small>
+                </div>
+
+                <div class="kpi-card">
+                    <h6>Fielding %</h6>
+                    <h3>{{ team_data.fielding_pct }}</h3>
+                    <small>Overall Fielding</small>
+                </div>
+
+            </div>
+						<!-- CHARTS -->
+<div class="charts-grid">
+
+    <!-- BATTING -->
+    <div class="chart-card">
+
+        <div class="chart-top">
+            <h4>Batting Statistics</h4>
+        </div>
+
+        <div class="stats-tabs batting-tabs">
+
+            <span class="active" data-metric="runs">Runs</span>
+            <span data-metric="average">Average</span>
+            <span data-metric="strike_rate">Strike Rate</span>
+            <span data-metric="fifties">50s</span>
+            <span data-metric="hundreds">100s</span>
+            <span data-metric="fours">4s</span>
+            <span data-metric="sixes">6s</span>
+
+        </div>
+
+        <canvas id="battingChart"></canvas>
+
     </div>
 
-    <div class="card">
-        <h2>{{ stats.losses }}</h2>
-        <p>Losses</p>
-    </div>
+    <!-- BOWLING -->
+    <div class="chart-card">
 
-    <div class="card">
-        <h2>{{ stats.win_percentage }}%</h2>
-        <p>Win %</p>
-    </div>
+        <div class="chart-top">
+            <h4>Bowling Statistics</h4>
+        </div>
 
-    <div class="card">
-        <h2>{{ stats.runs }}</h2>
-        <p>Total Runs</p>
-    </div>
+        <div class="stats-tabs bowling-tabs">
 
-    <div class="card">
-        <h2>{{ stats.wickets }}</h2>
-        <p>Total Wickets</p>
+            <span class="active" data-metric="wickets">Wickets</span>
+            <span data-metric="average">Average</span>
+            <span data-metric="economy">Economy</span>
+            <span data-metric="strike_rate">Strike Rate</span>
+            <span data-metric="maidens">Maidens</span>
+            <span data-metric="four_wickets">4W</span>
+            <span data-metric="five_wickets">5W</span>
+
+        </div>
+
+        <canvas id="bowlingChart"></canvas>
+
     </div>
 
 </div>
 
-<hr>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
-<h2>🏟 Venue Performance</h2>
+<script>
 
-<form method="POST">
+Chart.register(ChartDataLabels);
 
-    <input
-        type="hidden"
-        name="team"
-        value="{{ selected_team }}"
-    >
+/* BATTING DATA */
 
-    <select name="venue">
+const battingData = {
+    runs: {{ team_data.batting.runs|tojson }},
+    average: {{ team_data.batting.average|tojson }},
+    strike_rate: {{ team_data.batting.strike_rate|tojson }},
+    fifties: {{ team_data.batting.fifties|tojson }},
+    hundreds: {{ team_data.batting.hundreds|tojson }},
+    fours: {{ team_data.batting.fours|tojson }},
+    sixes: {{ team_data.batting.sixes|tojson }}
+};
 
-        <option value="">
-            Select Venue
-        </option>
+const battingPlayers = {{ team_data.batting.players|tojson }};
 
-        {% for venue in stats.venues %}
+const battingChart = new Chart(
+    document.getElementById("battingChart"),
+    {
+        type: "bar",
+        data: {
+            labels: battingPlayers,
+            datasets: [{
+                data: battingData.runs,
+                backgroundColor: "#2563eb",
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: "y",
+            plugins: {
+                legend: {
+                    display: false
+                },
+                datalabels: {
+                    color: "#111827",
+                    anchor: "end",
+                    align: "right",
+                    font: {
+                        size: 13,
+                        weight: "bold"
+                    }
+                }
+            }
+        }
+    }
+);
 
-        <option value="{{ venue }}"
-        {% if venue == selected_venue %}
-        selected
-        {% endif %}
-        >
-            {{ venue }}
-        </option>
+document.querySelectorAll(".batting-tabs span").forEach(tab => {
 
-        {% endfor %}
+    tab.addEventListener("click", function () {
 
-    </select>
+        document.querySelectorAll(".batting-tabs span")
+        .forEach(t => t.classList.remove("active"));
 
-    <button type="submit">
-        Apply Filter
-    </button>
+        this.classList.add("active");
 
-</form>
+        battingChart.data.datasets[0].data =
+            battingData[this.dataset.metric];
 
-{% endif %}
+        battingChart.update();
 
-{% if venue_stats %}
+    });
 
-<hr>
+});
 
-<h2>🏟 {{ selected_venue }}</h2>
+/* BOWLING DATA */
 
-<div class="team-kpi-grid">
+const bowlingData = {
+    wickets: {{ team_data.bowling.wickets|tojson }},
+    average: {{ team_data.bowling.average|tojson }},
+    economy: {{ team_data.bowling.economy|tojson }},
+    strike_rate: {{ team_data.bowling.strike_rate|tojson }},
+    maidens: {{ team_data.bowling.maidens|tojson }},
+    four_wickets: {{ team_data.bowling.four_wickets|tojson }},
+    five_wickets: {{ team_data.bowling.five_wickets|tojson }}
+};
 
-    <div class="card">
-        <h2>{{ venue_stats.matches }}</h2>
-        <p>Matches</p>
-    </div>
+const bowlingPlayers = {{ team_data.bowling.players|tojson }};
 
-    <div class="card">
-        <h2>{{ venue_stats.wins }}</h2>
-        <p>Wins</p>
-    </div>
+const bowlingChart = new Chart(
+    document.getElementById("bowlingChart"),
+    {
+        type: "bar",
+        data: {
+            labels: bowlingPlayers,
+            datasets: [{
+                data: bowlingData.wickets,
+                backgroundColor: "#16a34a",
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: "y",
+            plugins: {
+                legend: {
+                    display: false
+                },
+                datalabels: {
+                    color: "#111827",
+                    anchor: "end",
+                    align: "right",
+                    font: {
+                        size: 13,
+                        weight: "bold"
+                    }
+                }
+            }
+        }
+    }
+);
 
-    <div class="card">
-        <h2>{{ venue_stats.losses }}</h2>
-        <p>Losses</p>
-    </div>
+document.querySelectorAll(".bowling-tabs span").forEach(tab => {
 
-    <div class="card">
-        <h2>{{ venue_stats.win_percentage }}%</h2>
-        <p>Win %</p>
-    </div>
+    tab.addEventListener("click", function () {
 
-    <div class="card">
-        <h2>{{ venue_stats.runs }}</h2>
-        <p>Total Runs</p>
-    </div>
+        document.querySelectorAll(".bowling-tabs span")
+        .forEach(t => t.classList.remove("active"));
 
-    <div class="card">
-        <h2>{{ venue_stats.wickets }}</h2>
-        <p>Total Wickets</p>
-    </div>
+        this.classList.add("active");
 
-</div>
+        bowlingChart.data.datasets[0].data =
+            bowlingData[this.dataset.metric];
 
-{% endif %}
+        bowlingChart.update();
+
+    });
+
+});
+
+</script>
 
 {% endblock %}
