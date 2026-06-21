@@ -1,13 +1,20 @@
 {% extends "base.html" %}
 
+{% block title %}
+IPL Analytics Dashboard
+{% endblock %}
+
 {% block content %}
 
 <!-- HERO SECTION -->
 
 <section class="hero">
 
+
+<div class="container-xl">
+
     <div class="badge-custom">
-        Data • Insights • Performance
+        DATA • INSIGHTS • PERFORMANCE
     </div>
 
     <h1>
@@ -16,117 +23,290 @@
     </h1>
 
     <p>
-        Explore IPL teams, player performances,
-        venue records, head-to-head rivalries and
-        season insights through one powerful platform.
+        Explore team performance, player statistics,
+        head-to-head battles, venue insights and
+        season trends from every IPL campaign.
     </p>
 
     <div class="hero-buttons">
 
-        <button class="btn btn-primary btn-lg">
+        <a href="{{ url_for('teams') }}"
+           class="btn btn-primary btn-lg">
             Explore Teams
-        </button>
+        </a>
 
-        <button class="btn btn-outline-primary btn-lg">
+        <a href="{{ url_for('players') }}"
+           class="btn btn-outline-primary btn-lg">
             Analyze Players
-        </button>
-
-    </div>
-
-</section>
-
-<!-- KPI STATS SECTION -->
-
-<section class="container-xl mt-5">
-
-    <div class="stats-bar">
-
-        <div class="stat-item">
-            <div class="icon-circle">📊</div>
-            <div>
-                <h3>{{ total_matches }}+</h3>
-                <p>Matches</p>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="stat-item">
-            <div class="icon-circle">👥</div>
-            <div>
-                <h3>{{ total_players }}+</h3>
-                <p>Players</p>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="stat-item">
-            <div class="icon-circle">🏟️</div>
-            <div>
-                <h3>{{ total_venues }}+</h3>
-                <p>Venues</p>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="stat-item">
-            <div class="icon-circle">🏆</div>
-            <div>
-                <h3>{{ total_seasons }}</h3>
-                <p>Seasons</p>
-            </div>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- RECENT IPL CHAMPIONS -->
-
-<section class="container-xl mt-5 mb-5">
-
-    <div class="section-header">
-
-        <h2 class="section-title">
-            Recent IPL Champions
-        </h2>
-
-        <a href="#" class="view-all-link">
-            View All →
         </a>
 
     </div>
 
-    <div class="row g-4">
+</div>
 
-        {% for winner in winners %}
 
-        <div class="col-lg-3 col-md-6">
+</section>
 
-            <div class="winner-card">
+<!-- FEATURE CARDS -->
 
-                <span class="season-badge">
-                    {{ winner.year }}
-                </span>
+<section class="container-xl mt-5">
 
-                <img
-                    src="{{ url_for('static', filename='images/' + winner.logo) }}"
-                    alt="{{ winner.team }}">
 
-                <h5>{{ winner.team }}</h5>
+<div class="row g-4">
 
-                <p>IPL Champion</p>
+    <div class="col-lg-3 col-md-6">
 
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                👥
             </div>
+
+            <h5>Team Analytics</h5>
+
+            <p>
+                Analyze team performance,
+                winning trends and season-wise
+                statistics.
+            </p>
+
+            <a href="{{ url_for('teams') }}"
+               class="explore-link">
+                Explore Teams →
+            </a>
 
         </div>
 
-        {% endfor %}
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                👤
+            </div>
+
+            <h5>Player Analytics</h5>
+
+            <p>
+                Discover batting records,
+                bowling performances and
+                player comparisons.
+            </p>
+
+            <a href="{{ url_for('players') }}"
+               class="explore-link">
+                Explore Players →
+            </a>
+
+        </div>
 
     </div>
 
+    <div class="col-lg-3 col-md-6">
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                ⚡
+            </div>
+
+            <h5>H2H Analytics</h5>
+
+            <p>
+                Compare teams through
+                head-to-head records and
+                rivalry insights.
+            </p>
+
+            <a href="{{ url_for('h2h') }}"
+               class="explore-link">
+                Explore H2H →
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                🏟️
+            </div>
+
+            <h5>Match Insights</h5>
+
+            <p>
+                Explore venue trends,
+                toss impact and match
+                performance metrics.
+            </p>
+
+            <a href="{{ url_for('match_insights') }}"
+               class="explore-link">
+                Explore Matches →
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</section>
+
+<!-- KPI STATS -->
+
+<section class="container-xl mt-5">
+
+
+<div class="stats-bar">
+
+    <div class="stat-item">
+
+        <div class="stat-icon">
+            📊
+        </div>
+
+        <div>
+
+            <h3>
+                {{ total_matches }}
+            </h3>
+
+            <p>
+                Matches Analyzed
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="stat-item">
+
+        <div class="stat-icon">
+            👤
+        </div>
+
+        <div>
+
+            <h3>
+                {{ total_players }}
+            </h3>
+
+            <p>
+                Players Profiled
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="stat-item">
+
+        <div class="stat-icon">
+            🏟️
+        </div>
+
+        <div>
+
+            <h3>
+                {{ total_venues }}
+            </h3>
+
+            <p>
+                Venues Covered
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="stat-item">
+
+        <div class="stat-icon">
+            🏆
+        </div>
+
+        <div>
+
+            <h3>
+                {{ total_seasons }}
+            </h3>
+
+            <p>
+                IPL Seasons
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</section>
+
+<!-- RECENT CHAMPIONS -->
+
+<section id="champions"
+         class="container-xl mt-5 mb-5">
+
+
+<div class="section-header">
+
+    <h2 class="section-title">
+        🏆 Recent Champions
+    </h2>
+
+</div>
+
+<div class="row g-4">
+
+    {% for champion in winners %}
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="champion-card">
+
+            <div class="champion-logo">
+
+                <img src="{{ url_for('static',
+                filename='images/' + champion.logo) }}"
+                alt="{{ champion.team }}">
+
+            </div>
+
+            <div class="champion-badge">
+                {{ champion.year }}
+            </div>
+
+            <h5 class="champion-name">
+                {{ champion.team }}
+            </h5>
+
+            <p>
+                IPL {{ champion.year }}
+                Champion
+            </p>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
 
 </section>
 
