@@ -34,7 +34,10 @@ except Exception as e:
 # ==========================================
 # TEAM LOGOS
 # ==========================================
-
+df["match_won_by"] = (
+    df["match_won_by"]
+    .replace(TEAM_MAPPING)
+)
 LOGO_MAP = {
     "Chennai Super Kings": "CSK.png",
     "Mumbai Indians": "MI.jpg",
@@ -179,193 +182,239 @@ def home():
       total_venues=total_venues,
       total_seasons=total_seasons
 )
-
-# ==========================================
-# TEAMS PAGE
-# ==========================================
 @app.route("/teams")
 def teams():
-  return team_details("CSK")
+    return team_details("CSK")
 
 
 @app.route("/teams/<team>")
 def team_details(team):
 
-  team = TEAM_NAME_MAP.get(team, team)
+    team = TEAM_NAME_MAP.get(team, team)
 
-  batting_df = df[df["batting_team"] == team]
-  bowling_df = df[df["bowling_team"] == team]
+    match_summary = df[
+        [
+            "match_id",
+            "date",
+            "venue",
+            "batting_team",
+            "bowling_team",
+            "match_won_by",
+            "win_outcome"
+        ]
+    ].drop_duplicates(subset=["match_id"])
 
-  matches = df[
-      (df["batting_team"] == team) |
-      (df["bowling_team"] == team)
-  ]["match_id"].nunique()
+    batting_df = df[df["batting_team"] == team]
+    bowling_df = df[df["bowling_team"] == team]
 
-  wins = df[
-      df["match_won_by"] == team
-  ]["match_id"].nunique()
+    matches = match_summary[
+        (match_summary["batting_team"] == team) |
+        (match_summary["bowling_team"] == team)
+    ].shape[0]
 
-  losses = max(matches - wins, 0)
+    wins = match_summary[
+        match_summary["match_won_by"] == team
+    ].shape[0]
 
-  win_percentage = round(
-      (wins / matches) * 100,
-      2
-  ) if matches else 0
+    losses = matches - wins
 
-  selected_team = {
-      "name": team,
-      "short_name": SHORT_NAMES.get(team, ""),
-      "logo": LOGO_MAP.get(team, "IPL1.jpg"),
-      "matches": matches,
-      "wins": wins,
-      "losses": losses,
-      "win_percentage": win_percentage
-  }
+    win_percentage = round(
+        (wins / matches) * 100,
+        2
+    ) if matches else 0
 
-  total_runs = int(batting_df["batter_runs"].sum())
+    selected_team = {
+        "name": team,
+        "short_name": SHORT_NAMES.get(team, ""),
+        "logo": LOGO_MAP.get(team, "IPL1.jpg"),
+        "matches": matches,
+        "wins": wins,
+        "losses": losses,
+        "win_percentage": win_percentage
+    }
 
-  total_balls = int(
-      batting_df["batter_balls"].sum()
-  )
+    total_runs = int(
+        batting_df["batter_runs"].sum()
+    )
 
-  strike_rate = round(
-      (total_runs / total_balls) * 100,
-      2
-  ) if total_balls else 0
+    total_balls = int(
+        batting_df["batter_balls"].sum()
+    )
 
-  batting_average = round(
-      batting_df["batter_runs"].mean(),
-      2
-  ) if not batting_df.empty else 0
+    strike_rate = round(
+        (total_runs / total_balls) * 100,
+        2
+    ) if total_balls else 0
 
-  runs_per_match = round(
-      total_runs / matches,
-      2
-  ) if matches else 0
+    runs_per_match = round(
+        total_runs / matches,
+        2
+    ) if matches else 0
 
-  match_totals = batting_df.groupby(
-      "match_id"
-  )["runs_total"].sum()
+    innings_totals = batting_df.groupby(
+        ["match_id", "innings"]
+    )["runs_total"].sum()
 
-  highest_score = int(
-      match_totals.max()
-  ) if not match_totals.empty else 0
+    highest_total = int(
+        innings_totals.max()
+    ) if not innings_totals.empty else 0
 
-  valid_totals = match_totals[
-      match_totals > 0
-  ]
+    lowest_total = int(
+        innings_totals[innings_totals > 0].min()
+    ) if not innings_totals.empty else 0
 
-  lowest_total = int(
-      valid_totals.min()
-  ) if not valid_totals.empty else 0
+    boundary_percentage = round(
+        (
+            batting_df["batter_runs"]
+            .isin([4, 6])
+            .sum()
+            / len(batting_df)
+        ) * 100,
+        2
+    ) if len(batting_df) else 0
 
-  boundary_percentage = round(
-      (
-          batting_df["batter_runs"]
-          .isin([4, 6])
-          .sum()
-          / len(batting_df)
-      ) * 100,
-      2
-  ) if len(batting_df) else 0
+    most_runs_scorer = (
+        batting_df.groupby("batter")["batter_runs"]
+        .sum()
+        .idxmax()
+        if not batting_df.empty else "-"
+    )
 
-  batting = {
-      "average": batting_average,
-      "strike_rate": strike_rate,
-      "total_runs": total_runs,
-      "highest_score": highest_score,
-      "boundary_percentage": boundary_percentage,
-      "runs_per_match": runs_per_match
-  }
+    player_scores = batting_df.groupby(
+        ["match_id", "batter"]
+    )["batter_runs"].sum()
 
-  wickets = int(
-      bowling_df["bowler_wicket"].sum()
-  )
+    centuries = int(
+        (player_scores >= 100).sum()
+    )
 
-  balls = int(
-      bowling_df["valid_ball"].sum()
-  )
+    batting = {
+        "runs_per_match": runs_per_match,
+				"total_runs": total_runs,
+				"strike_rate": strike_rate,
+				"highest_score": highest_total,
+				"boundary_percentage": boundary_percentage,
+				"most_runs": most_runs_scorer,
+				"centuries": centuries
+    }
 
-  overs = balls / 6 if balls else 0
+    wickets = int(
+        bowling_df["bowler_wicket"].sum()
+    )
 
-  bowling = {
-      "average": round(
-          bowling_df["runs_total"].sum() / wickets,
-          2
-      ) if wickets else 0,
+    balls = int(
+        bowling_df["valid_ball"].sum()
+    )
 
-      "economy": round(
-          bowling_df["runs_total"].sum() / overs,
-          2
-      ) if overs else 0,
+    overs = balls / 6 if balls else 0
 
-      "total_wickets": wickets,
+    most_wicket_taker = (
+        bowling_df.groupby("bowler")["bowler_wicket"]
+        .sum()
+        .idxmax()
+        if not bowling_df.empty else "-"
+    )
 
-      "dot_ball_percentage": round(
-          (
-              len(
-                  bowling_df[
-                      bowling_df["runs_total"] == 0
-                  ]
-              )
-              / len(bowling_df)
-          ) * 100,
-          2
-      ) if len(bowling_df) else 0,
+    bowling = {
+        "average": round(
+            bowling_df["runs_total"].sum() / wickets,
+            2
+        ) if wickets else 0,
 
-      "strike_rate": round(
-          balls / wickets,
-          2
-      ) if wickets else 0,
+        "economy": round(
+            bowling_df["runs_total"].sum() / overs,
+            2
+        ) if overs else 0,
 
-      "wickets_per_match": round(
-          wickets / matches,
-          2
-      ) if matches else 0
-  }
+        "total_wickets": wickets,
 
-  records = {
-      "highest_total": highest_score,
+        "dot_ball_percentage": round(
+            (
+                len(
+                    bowling_df[
+                        bowling_df["runs_total"] == 0
+                    ]
+                )
+                / len(bowling_df)
+            ) * 100,
+            2
+        ) if len(bowling_df) else 0,
 
-      "lowest_total": lowest_total,
+        "strike_rate": round(
+            balls / wickets,
+            2
+        ) if wickets else 0,
 
-      "most_runs": batting_df.groupby(
-          "batter"
-      )["batter_runs"]
-      .sum()
-      .idxmax()
-      if not batting_df.empty else "-",
+        "most_wickets": most_wicket_taker
+    }
 
-      "best_bowling": "-",
+    records = {
+        "highest_total": highest_total,
+        "lowest_total": lowest_total,
+        "most_runs": most_runs_scorer,
+        "most_wickets": most_wicket_taker,
+        "best_bowling": most_wicket_taker
+    }
+    team_matches = match_summary[
+        (match_summary["batting_team"] == team) |
+        (match_summary["bowling_team"] == team)
+    ]
 
-      "most_wickets": bowling_df.groupby(
-          "bowler"
-      )["bowler_wicket"]
-      .sum()
-      .idxmax()
-      if not bowling_df.empty else "-"
-  }
+    if not team_matches.empty:
 
-  teams = []
+        team_matches = team_matches.copy()
 
-  for team_name in SHORT_NAMES.keys():
+        team_matches["date"] = pd.to_datetime(
+            team_matches["date"],
+            errors="coerce"
+        )
 
-      teams.append({
-          "name": team_name,
-          "short_name": SHORT_NAMES[team_name],
-          "logo": LOGO_MAP[team_name]
-      })
+        latest_match = team_matches.sort_values(
+            "date",
+            ascending=False
+        ).iloc[0]
 
-  return render_template(
-      "teams.html",
-      teams=teams,
-      selected_team=selected_team,
-      batting=batting,
-      bowling=bowling,
-      records=records
-  )
+        opponent = (
+            latest_match["bowling_team"]
+            if latest_match["batting_team"] == team
+            else latest_match["batting_team"]
+        )
 
+        recent_match = {
+            "opponent": opponent,
+            "venue": latest_match["venue"],
+            "date": latest_match["date"].strftime("%d-%m-%Y"),
+            "result": latest_match["win_outcome"]
+        }
 
+    else:
+
+        recent_match = {
+            "opponent": "-",
+            "venue": "-",
+            "date": "-",
+            "result": "-"
+        }
+
+    teams = []
+
+    for team_name in SHORT_NAMES.keys():
+
+        teams.append({
+            "name": team_name,
+            "short_name": SHORT_NAMES[team_name],
+            "logo": LOGO_MAP[team_name]
+        })
+
+    return render_template(
+        "teams.html",
+        teams=teams,
+        selected_team=selected_team,
+        batting=batting,
+        bowling=bowling,
+        records=records,
+        recent_match=recent_match
+    )
 
 # ==========================================
 # PLAYERS PAGE

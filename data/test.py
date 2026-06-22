@@ -1,53 +1,22 @@
 import pandas as pd
 
-ipl = pd.read_csv("IPL.csv", low_memory=False)
-print(ipl.columns.tolist())
+df = pd.read_csv("IPL.csv", low_memory=False)
 
-# print("Before:")
-# print(ipl["date"].dtype)
+TEAM_MAPPING = {
+    "Deccan Chargers": "Sunrisers Hyderabad",
+    "Delhi Daredevils": "Delhi Capitals",
+    "Kings XI Punjab": "Punjab Kings",
+    "Royal Challengers Bangalore": "Royal Challengers Bengaluru"
+}
 
-# ipl["date"] = pd.to_datetime(
-#     ipl["date"],
-#     dayfirst=True,
-#     errors="coerce"
-# )
+df["match_won_by"] = df["match_won_by"].replace(TEAM_MAPPING)
 
-# # print("\nAfter:")
-# # print(ipl["date"].dtype)
+matches_df = df[
+    ["match_id", "match_won_by"]
+].drop_duplicates("match_id")
 
-# # print("\nLatest Date:")
-# # print(ipl["date"].max())
-
-# # print("\nLatest 10 Dates:")
-# # print(
-# #     ipl["date"]
-# #     .sort_values(ascending=False)
-# #     .head(10)
-# # )
-# latest_match_id = (
-#     ipl.sort_values("date", ascending=False)
-#     ["match_id"]
-#     .iloc[0]
-# )
-
-# print("Latest Match ID:", latest_match_id)
-
-# latest_match = ipl[
-#     ipl["match_id"] == latest_match_id
-# ]
-
-# summary = (
-#     latest_match
-#     .groupby("batting_team")
-#     .agg({
-#         "team_runs":"max",
-#         "team_wicket":"max"
-#     })
-# )
-
-# print(summary)
-
-# print(
-#     latest_match["match_won_by"]
-#     .iloc[0]
-# )
+print(
+    matches_df["match_won_by"]
+    .value_counts()
+    .head(15)
+)

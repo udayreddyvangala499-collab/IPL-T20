@@ -16,244 +16,180 @@ Teams Analytics
 </section>
 
 <section class="teams-section">
-
 <div class="container-xl">
 
-    <div class="teams-layout">
+<div class="teams-layout">
 
-        <!-- SIDEBAR -->
 
-        <div class="teams-sidebar">
+<!-- SIDEBAR -->
 
-            <div class="card-custom">
+<div class="teams-sidebar">
 
-                <h3>All IPL Teams</h3>
+    <div class="card-custom">
 
-                <div class="teams-grid">
+        <h3>All IPL Teams</h3>
 
-                    {% for team in teams %}
+        <div class="teams-grid">
 
-                    <a href="{{ url_for('team_details', team=team.name) }}"
-                       class="team-card">
+            {% for team in teams %}
 
-                        <img
-                            src="{{ url_for('static', filename='images/' + team.logo) }}"
-                            alt="{{ team.name }}"
-                        >
+            <a href="{{ url_for('team_details', team=team.short_name) }}"
+               class="team-card {% if team.name == selected_team.name %}active-team{% endif %}">
 
-                        <div>
-                            <h4>{{ team.short_name }}</h4>
-                            <p>{{ team.name }}</p>
-                        </div>
+                <img
+                    src="{{ url_for('static', filename='images/' + team.logo) }}"
+                    alt="{{ team.name }}"
+                >
 
-                    </a>
-
-                    {% endfor %}
-
+                <div>
+                    <h4>{{ team.short_name }}</h4>
+                    <p>{{ team.name }}</p>
                 </div>
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CONTENT -->
+
+<div class="teams-content">
+
+    <!-- TEAM BANNER -->
+
+    <div class="team-banner">
+
+        <div class="team-info">
+
+            <img
+                src="{{ url_for('static', filename='images/' + selected_team.logo) }}"
+                alt="{{ selected_team.name }}"
+            >
+
+            <div>
+
+                <h2>{{ selected_team.name }}</h2>
+
+                <span class="badge">
+                    {{ selected_team.short_name }}
+                </span>
 
             </div>
 
         </div>
 
-        <!-- MAIN CONTENT -->
+        <div class="team-stats">
 
-        <div class="teams-content">
-
-            <!-- TEAM BANNER -->
-
-            <div class="team-banner">
-
-                <div class="team-info">
-
-                    <img
-                        src="{{ url_for('static', filename='images/' + selected_team.logo) }}"
-                        alt="{{ selected_team.name }}"
-                    >
-
-                    <div>
-
-                        <h2>{{ selected_team.name }}</h2>
-
-                        <span class="badge">
-                            {{ selected_team.short_name }}
-                        </span>
-
-                    </div>
-
-                </div>
-
-                <div class="team-stats">
-
-                    <div class="stat">
-                        <h5>Matches</h5>
-                        <span>{{ selected_team.matches }}</span>
-                    </div>
-
-                    <div class="stat">
-                        <h5>Wins</h5>
-                        <span>{{ selected_team.wins }}</span>
-                    </div>
-
-                    <div class="stat">
-                        <h5>Losses</h5>
-                        <span>{{ selected_team.losses }}</span>
-                    </div>
-
-                    <div class="stat">
-                        <h5>Win %</h5>
-                        <span>{{ selected_team.win_percentage }}%</span>
-                    </div>
-
-                </div>
-
+            <div class="stat">
+                <h5>Matches</h5>
+                <span>{{ selected_team.matches }}</span>
             </div>
 
-            <!-- STATS SECTION -->
-
-            <div class="stats-wrapper">
-
-                <!-- BATTING -->
-
-                <div class="stats-card">
-
-                    <h3>Batting Statistics</h3>
-
-                    <div class="stats-grid">
-
-                        <div class="metric">
-                            <h4>{{ batting.average }}</h4>
-                            <p>Batting Average</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ batting.strike_rate }}</h4>
-                            <p>Strike Rate</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ batting.total_runs }}</h4>
-                            <p>Total Runs</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ batting.highest_score }}</h4>
-                            <p>Highest Score</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ batting.boundary_percentage }}%</h4>
-                            <p>Boundary %</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ batting.runs_per_match }}</h4>
-                            <p>Runs / Match</p>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- BOWLING -->
-
-                <div class="stats-card">
-
-                    <h3>Bowling Statistics</h3>
-
-                    <div class="stats-grid">
-
-                        <div class="metric">
-                            <h4>{{ bowling.average }}</h4>
-                            <p>Bowling Average</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ bowling.economy }}</h4>
-                            <p>Economy Rate</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ bowling.total_wickets }}</h4>
-                            <p>Total Wickets</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ bowling.dot_ball_percentage }}%</h4>
-                            <p>Dot Ball %</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ bowling.strike_rate }}</h4>
-                            <p>Strike Rate</p>
-                        </div>
-
-                        <div class="metric">
-                            <h4>{{ bowling.wickets_per_match }}</h4>
-                            <p>Wickets / Match</p>
-                        </div>
-
-                    </div>
-
-                </div>
-
+            <div class="stat">
+                <h5>Wins</h5>
+                <span>{{ selected_team.wins }}</span>
             </div>
 
-            <!-- BOTTOM SECTION -->
+            <div class="stat">
+                <h5>Losses</h5>
+                <span>{{ selected_team.losses }}</span>
+            </div>
 
-            <div class="bottom-section">
+            <div class="stat">
+                <h5>Win %</h5>
+                <span>{{ selected_team.win_percentage }}%</span>
+            </div>
 
-                <!-- RECENT MATCH -->
+        </div>
 
-                <div class="recent-match-card">
+    </div>
+		<!-- BATTING + BOWLING -->
 
-                    <h3>Recent Match</h3>
+	<div class="stats-wrapper">
 
-                    <div class="recent-content">
+			<!-- BATTING -->
 
-                        <h4>
-                            {{ selected_team.name }}
-                        </h4>
+			<div class="stats-card">
 
-                        <p>
-                            Latest match information will appear here
-                        </p>
+        <h3>Batting Statistics</h3>
 
-                    </div>
+        <div class="stats-grid">
 
-                </div>
+            <div class="metric">
+                <h4>{{ selected_team.matches }}</h4>
+                <p>Matches Played</p>
+            </div>
 
-                <!-- TEAM RECORDS -->
+            <div class="metric">
+                <h4>{{ batting.total_runs }}</h4>
+                <p>Total Runs</p>
+            </div>
 
-                <div class="records-section">
+            <div class="metric">
+                <h4>{{ batting.strike_rate }}</h4>
+                <p>Strike Rate</p>
+            </div>
 
-                    <div class="record-card">
-                        <h4>{{ records.highest_total }}</h4>
-                        <p>Highest Total</p>
-                    </div>
+            <div class="metric">
+                <h4>{{ batting.highest_score }}</h4>
+                <p>Highest Total</p>
+            </div>
 
-                    <div class="record-card">
-                        <h4>{{ records.lowest_total }}</h4>
-                        <p>Lowest Total</p>
-                    </div>
+            <div class="metric">
+                <h4>{{ batting.boundary_percentage }}%</h4>
+                <p>Boundary %</p>
+            </div>
 
-                    <div class="record-card">
-                        <h4>{{ records.most_runs }}</h4>
-                        <p>Most Runs</p>
-                    </div>
+            <div class="metric">
+                <h4>{{ batting.most_runs }}</h4>
+                <p>Most Runs Scorer</p>
+            </div>
 
-                    <div class="record-card">
-                        <h4>{{ records.best_bowling }}</h4>
-                        <p>Best Bowling</p>
-                    </div>
+        </div>
 
-                    <div class="record-card">
-                        <h4>{{ records.most_wickets }}</h4>
-                        <p>Most Wickets</p>
-                    </div>
+    </div>
 
-                </div>
+    <!-- BOWLING -->
 
+    <div class="stats-card">
+
+        <h3>Bowling Statistics</h3>
+
+        <div class="stats-grid">
+
+            <div class="metric">
+                <h4>{{ bowling.total_wickets }}</h4>
+                <p>Total Wickets</p>
+            </div>
+
+            <div class="metric">
+                <h4>{{ bowling.average }}</h4>
+                <p>Bowling Average</p>
+            </div>
+
+            <div class="metric">
+                <h4>{{ bowling.economy }}</h4>
+                <p>Economy Rate</p>
+            </div>
+
+            <div class="metric">
+                <h4>{{ bowling.dot_ball_percentage }}%</h4>
+                <p>Dot Ball %</p>
+            </div>
+
+            <div class="metric">
+                <h4>{{ bowling.strike_rate }}</h4>
+                <p>Bowling Strike Rate</p>
+            </div>
+
+            <div class="metric">
+                <h4>{{ bowling.most_wickets }}</h4>
+                <p>Most Wicket Taker</p>
             </div>
 
         </div>
@@ -262,6 +198,64 @@ Teams Analytics
 
 </div>
 
+<!-- BOTTOM SECTION -->
+
+<div class="bottom-section">
+
+    <!-- RECENT MATCH -->
+
+    <div class="recent-match-card">
+
+        <h3>Recent Match</h3>
+
+        <div class="recent-content">
+
+            <h4>{{ selected_team.name }}</h4>
+
+            <p><strong>Opponent:</strong> {{ recent_match.opponent }}</p>
+            <p><strong>Venue:</strong> {{ recent_match.venue }}</p>
+            <p><strong>Date:</strong> {{ recent_match.date }}</p>
+            <p><strong>Result:</strong> {{ recent_match.result }}</p>
+
+        </div>
+
+    </div>
+
+    <!-- TEAM RECORDS -->
+
+    <div class="team-records-card">
+
+        <h3>Team Records</h3>
+
+        <div class="record-row">
+            <span>Highest Total</span>
+            <strong>{{ records.highest_total }}</strong>
+        </div>
+
+        <div class="record-row">
+            <span>Lowest Total</span>
+            <strong>{{ records.lowest_total }}</strong>
+        </div>
+
+        <div class="record-row">
+            <span>Most Runs</span>
+            <strong>{{ records.most_runs }}</strong>
+        </div>
+
+        <div class="record-row">
+            <span>Most Wickets</span>
+            <strong>{{ records.most_wickets }}</strong>
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
 </section>
 
 {% endblock %}
