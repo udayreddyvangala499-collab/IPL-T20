@@ -1,6 +1,13 @@
-from flask import Flask, render_template
+from flask import (
+    Flask,
+    render_template,
+    url_for,
+    request,
+    redirect
+)
 import pandas as pd
 
+import pandas as pd
 app = Flask(__name__)
 
 # ==========================================
@@ -419,24 +426,364 @@ def team_details(team):
 # ==========================================
 # PLAYERS PAGE
 # ==========================================
-
 @app.route("/players")
 def players():
 
-    players_list = sorted(
-        pd.concat(
-            [
-                df["batter"],
-                df["bowler"]
+    search = request.args.get(
+        "search",
+        ""
+    ).strip()
+
+    all_players = sorted(
+        df["batter"]
+        .dropna()
+        .unique()
+    )
+
+    if search:
+
+        matching_players = [
+            p for p in all_players
+            if search.lower() in p.lower()
+        ]
+
+        if matching_players:
+
+            return redirect(
+                url_for(
+                    "player_details",
+                    player=matching_players[0]
+                )
+            )
+
+    return player_details("V Kohli")
+
+@app.route("/players/<player>")
+def player_details(player):
+
+    batting_df = df[
+        df["batter"] == player
+    ].copy()
+
+    bowling_df = df[
+        df["bowler"] == player
+    ].copy()
+
+    # ==========================================
+    # PLAYER OVERVIEW
+    # ==========================================
+
+    matches = batting_df["match_id"].nunique()
+
+    total_runs = int(
+        batting_df["runs_batter"].sum()
+    )
+
+    total_balls = int(
+        batting_df["balls_faced"].sum()
+    )
+
+    dismissals = int(
+        (df["player_out"] == player).sum()
+    )
+
+    average = round(
+        total_runs / dismissals,
+        2
+    ) if dismissals else total_runs
+
+    strike_rate = round(
+        (total_runs / total_balls) * 100,
+        2
+    ) if total_balls else 0
+
+    primary_team = "-"
+
+    if not batting_df.empty:
+
+        primary_team = batting_df[
+            "batting_team"
+        ].mode()[0]
+
+    selected_player = {
+    "name": player,
+    "team": primary_team,
+    "logo": LOGO_MAP.get(primary_team, "IPL1.jpg"),
+    "matches": matches,
+    "runs": total_runs,
+    "average": average,
+    "strike_rate": strike_rate
+}
+    # ==========================================
+    # BATTING STATS
+    # ==========================================
+
+    innings_scores = batting_df.groupby(
+        "match_id"
+    )["runs_batter"].sum()
+
+    highest_score = int(
+        innings_scores.max()
+    ) if not innings_scores.empty else 0
+
+    fifties = int(
+        (
+            (innings_scores >= 50) &
+            (innings_scores < 100)
+        ).sum()
+    )
+
+    centuries = int(
+        (innings_scores >= 100).sum()
+    )
+
+    batting = {
+        "matches": matches,
+        "runs": total_runs,
+        "average": average,
+        "strike_rate": strike_rate,
+        "fifties": fifties,
+        "centuries": centuries
+    }
+
+    # ==========================================
+    # BOWLING STATS
+    # ==========================================
+    
+
+    wickets = int(
+        bowling_df["bowler_wicket"].sum()
+    )
+
+    runs_conceded = int(
+        bowling_df["runs_bowler"].sum()
+    )
+
+    balls_bowled = int(
+        bowling_df["valid_ball"].sum()
+    )
+
+    overs = balls_bowled / 6 if balls_bowled else 0
+
+    bowling_average = round(
+        runs_conceded / wickets,
+        2
+    ) if wickets else 0
+
+    economy = round(
+        runs_conceded / overs,
+        2
+    ) if overs else 0
+
+    bowling_sr = round(
+        balls_bowled / wickets,
+        2
+    ) if wickets else 0
+
+    best_bowling = "-"
+    five_wickets = 0
+
+    if not bowling_df.empty:
+
+        wickets_per_match = bowling_df.groupby(
+            "match_id"
+        )["bowler_wicket"].sum()
+
+        five_wickets = int(
+            (wickets_per_match >= 5).sum()
+        )
+
+        if not wickets_per_match.empty:
+
+            best_match_id = wickets_per_match.idxmax()
+
+            best_match_df = bowling_df[
+                bowling_df["match_id"] == best_match_id
             ]
-        ).dropna().unique()
+
+            best_wickets = int(
+                best_match_df["bowler_wicket"].sum()
+            )
+
+            best_runs = int(
+                best_match_df["runs_bowler"].sum()
+            )
+
+            best_bowling = f"{best_wickets}/{best_runs}"
+
+    bowling = {
+        "wickets": wickets,
+        "average": bowling_average,
+        "economy": economy,
+        "strike_rate": bowling_sr,
+        "best": best_bowling,
+        "five_wickets": five_wickets
+    }
+    # ==========================================
+    # SEASON WISE STATS
+    # ==========================================
+
+    season_stats = []
+
+    for season in sorted(
+        batting_df["season"]
+        .dropna()
+        .unique(),
+        reverse=True
+    ):
+
+        season_df = batting_df[
+            batting_df["season"] == season
+        ]
+
+        season_runs = int(
+            season_df["runs_batter"].sum()
+        )
+
+        season_balls = int(
+            season_df["balls_faced"].sum()
+        )
+
+        season_matches = season_df[
+            "match_id"
+        ].nunique()
+
+        season_dismissals = df[
+            (df["season"] == season) &
+            (df["player_out"] == player)
+        ].shape[0]
+
+        season_scores = season_df.groupby(
+            "match_id"
+        )["runs_batter"].sum()
+
+        season_average = round(
+            season_runs / season_dismissals,
+            2
+        ) if season_dismissals else season_runs
+
+        season_sr = round(
+            (season_runs / season_balls) * 100,
+            2
+        ) if season_balls else 0
+
+        season_stats.append({
+
+            "season": season,
+
+            "matches": season_matches,
+
+            "runs": season_runs,
+
+            "average": season_average,
+
+            "strike_rate": season_sr,
+
+            "fifties": int(
+                (
+                    (season_scores >= 50) &
+                    (season_scores < 100)
+                ).sum()
+            ),
+
+            "centuries": int(
+                (season_scores >= 100).sum()
+            ),
+
+            "highest_score": int(
+                season_scores.max()
+            ) if not season_scores.empty else 0
+        })
+
+      # ==========================================
+    # RECENT INNINGS
+    # ==========================================
+
+    recent_innings = []
+
+    recent_matches = batting_df.groupby(
+        ["match_id", "date"]
+    ).agg({
+        "runs_batter": "sum",
+        "balls_faced": "sum",
+        "batting_team": "first",
+        "bowling_team": "first"
+    }).reset_index()
+
+    recent_matches["date"] = pd.to_datetime(
+        recent_matches["date"],
+        errors="coerce"
+    )
+
+    recent_matches = recent_matches.sort_values(
+        "date",
+        ascending=False
+    ).head(5)
+
+    for _, row in recent_matches.iterrows():
+
+        recent_innings.append({
+
+            "date": row["date"].strftime("%d-%m-%Y")
+            if pd.notnull(row["date"])
+            else "-",
+
+            "opponent": row["bowling_team"],
+
+            "runs": int(row["runs_batter"]),
+
+            "balls": int(row["balls_faced"]),
+
+            "strike_rate": round(
+                (row["runs_batter"] /
+                 row["balls_faced"]) * 100,
+                2
+            ) if row["balls_faced"] else 0
+        })
+
+    # ==========================================
+    # CAREER RECORDS
+    # ==========================================
+
+    records = {
+
+        "highest_score": highest_score,
+
+        "total_fifties": fifties,
+
+        "total_centuries": centuries,
+
+        "best_bowling": best_bowling,
+
+        "total_fours": int(
+            (batting_df["runs_batter"] == 4).sum()
+        ),
+
+        "total_sixes": int(
+            (batting_df["runs_batter"] == 6).sum()
+        )
+    }
+
+    # ==========================================
+    # PLAYER LIST
+    # ==========================================
+
+    players = sorted(
+        df["batter"]
+        .dropna()
+        .unique()
     )
 
     return render_template(
         "players.html",
-        players=players_list
+        players=players,
+        selected_player=selected_player,
+        batting=batting,
+        bowling=bowling,
+        season_stats=season_stats,
+        recent_innings=recent_innings,
+        records=records
     )
-
 # ==========================================
 # H2H PAGE
 # ==========================================
