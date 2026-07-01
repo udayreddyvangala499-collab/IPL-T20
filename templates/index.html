@@ -54,12 +54,12 @@ IPL Analytics Dashboard
 
 <div class="row g-4">
 
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-4 col-md-6">
 
         <div class="feature-card">
 
             <div class="feature-icon">
-                👥
+                <i class="fa-solid fa-people-group"></i>
             </div>
 
             <h5>Team Analytics</h5>
@@ -79,12 +79,12 @@ IPL Analytics Dashboard
 
     </div>
 
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-4 col-md-6">
 
         <div class="feature-card">
 
             <div class="feature-icon">
-                👤
+                <i class="fa-solid fa-user"></i>
             </div>
 
             <h5>Player Analytics</h5>
@@ -104,12 +104,12 @@ IPL Analytics Dashboard
 
     </div>
 
-    <div class="col-lg-3 col-md-6">
+    <div class="col-lg-4 col-md-6">
 
         <div class="feature-card">
 
             <div class="feature-icon">
-                ⚡
+                <i class="fa-solid fa-bolt"></i>
             </div>
 
             <h5>H2H Analytics</h5>
@@ -123,31 +123,6 @@ IPL Analytics Dashboard
             <a href="{{ url_for('h2h') }}"
                class="explore-link">
                 Explore H2H →
-            </a>
-
-        </div>
-
-    </div>
-
-    <div class="col-lg-3 col-md-6">
-
-        <div class="feature-card">
-
-            <div class="feature-icon">
-                🏟️
-            </div>
-
-            <h5>Match Insights</h5>
-
-            <p>
-                Explore venue trends,
-                toss impact and match
-                performance metrics.
-            </p>
-
-            <a href="{{ url_for('match_insights') }}"
-               class="explore-link">
-                Explore Matches →
             </a>
 
         </div>
@@ -169,7 +144,7 @@ IPL Analytics Dashboard
     <div class="stat-item">
 
         <div class="stat-icon">
-            📊
+            <i class="fa-solid fa-chart-simple"></i>
         </div>
 
         <div>
@@ -191,7 +166,7 @@ IPL Analytics Dashboard
     <div class="stat-item">
 
         <div class="stat-icon">
-            👤
+            <i class="fa-solid fa-user"></i>
         </div>
 
         <div>
@@ -213,7 +188,7 @@ IPL Analytics Dashboard
     <div class="stat-item">
 
         <div class="stat-icon">
-            🏟️
+            <i class="fa-solid fa-location-dot"></i>
         </div>
 
         <div>
@@ -235,7 +210,7 @@ IPL Analytics Dashboard
     <div class="stat-item">
 
         <div class="stat-icon">
-            🏆
+            <i class="fa-solid fa-trophy"></i>
         </div>
 
         <div>
@@ -266,8 +241,13 @@ IPL Analytics Dashboard
 <div class="section-header">
 
     <h2 class="section-title">
-        🏆 Recent Champions
+        <i class="fa-solid fa-trophy text-warning me-2"></i>Recent Champions
     </h2>
+
+    <a href="{{ url_for('winners') }}"
+       class="view-all-link">
+        View All Champions →
+    </a>
 
 </div>
 

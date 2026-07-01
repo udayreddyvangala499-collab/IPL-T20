@@ -1,57 +1,533 @@
 {% extends "base.html" %}
 
+{% block title %}
+H2H Analytics
+{% endblock %}
+
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/h2h_new.css') }}">
 
-<section class="teams-hero">
-
+<section class="h2h-dashboard">
     <div class="container-xl">
 
-        <span class="page-badge">
-            IPL Teams Analytics
-        </span>
-
-        <h1>
-            Explore IPL Teams
-        </h1>
-
-        <p>
-            Analyze team performance, winning percentage,
-            championships and historical records.
-        </p>
-
-    </div>
-
-</section>
-
-<section class="container-xl py-5">
-
-    <div class="row g-4">
-
-        {% for team in teams %}
-
-        <div class="col-lg-3 col-md-4 col-sm-6">
-
-            <div class="team-analytics-card">
-
-                <img
-                    src="{{ url_for('static',
-                    filename='images/' + team.logo) }}"
-                    alt="{{ team.name }}">
-
-                <h5>{{ team.name }}</h5>
-
-                <a href="#" class="btn btn-primary">
-                    View Analytics
-                </a>
-
+        <!-- Top Header -->
+        <div class="h2h-top-header" style="margin-bottom: 24px;">
+            <div>
+                <h2>H2H Analytics</h2>
+                <p>Head-to-Head Team Comparison and Statistics</p>
             </div>
-
         </div>
 
-        {% endfor %}
+        <!-- Banners -->
+        <div class="h2h-banners">
+            <div class="h2h-team-banner h2h-team1-banner">
+                <div class="h2h-banner-content">
+                    <div class="h2h-banner-logo">
+                        <img src="{{ url_for('static', filename='images/' + team1_info.logo) }}" alt="{{ team1_info.name }}">
+                    </div>
+                    <div class="h2h-banner-text">
+                        <h3>{{ team1_info.name }}</h3>
+                        <span class="h2h-banner-badge">{{ team1_info.short_name }}</span>
+                        <p>Established: {{ team1_info.established }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="h2h-vs-circle">VS</div>
+            
+            <div class="h2h-team-banner h2h-team2-banner">
+                <div class="h2h-banner-content">
+                    <div class="h2h-banner-logo">
+                        <img src="{{ url_for('static', filename='images/' + team2_info.logo) }}" alt="{{ team2_info.name }}">
+                    </div>
+                    <div class="h2h-banner-text">
+                        <h3>{{ team2_info.name }}</h3>
+                        <span class="h2h-banner-badge">{{ team2_info.short_name }}</span>
+                        <p>Established: {{ team2_info.established }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selectors Row -->
+        <div class="h2h-selectors-row">
+            <div class="h2h-select-group">
+                <label>Select Team 1</label>
+                <select id="team1Select">
+                    {% for team in teams %}
+                    <option value="{{ team.short_name }}" {% if team.short_name == team1 %}selected{% endif %}>{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="h2h-swap-icon" id="swapBtn">
+                <i class="fa-solid fa-right-left"></i>
+            </div>
+            
+            <div class="h2h-select-group">
+                <label>Select Team 2</label>
+                <select id="team2Select">
+                    {% for team in teams %}
+                    <option value="{{ team.short_name }}" {% if team.short_name == team2 %}selected{% endif %}>{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="h2h-select-group" style="margin-left: 16px;">
+                <label>Select Season</label>
+                <select id="seasonSelect">
+                    <option value="All IPL Seasons" {% if season == 'All IPL Seasons' %}selected{% endif %}>All IPL Seasons</option>
+                    {% for s in stats.seasons %}
+                    <option value="{{ s }}" {% if season|string == s|string %}selected{% endif %}>IPL {{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button class="h2h-compare-btn-new" id="compareBtn">Compare</button>
+        </div>
+
+        <!-- KPI Row -->
+        <div class="h2h-kpi-row">
+            <div class="h2h-kpi-card">
+                <div class="h2h-kpi-info">
+                    <h4>Total Matches</h4>
+                    <p class="kpi-val">{{ stats.matches }}</p>
+                </div>
+                <div class="h2h-kpi-icon icon-blue"><i class="fa-regular fa-calendar-days"></i></div>
+            </div>
+            
+            <div class="h2h-kpi-card">
+                <div class="h2h-kpi-info">
+                    <h4>{{ team1 }} Wins</h4>
+                    <p class="kpi-val">{{ stats.team1_wins }} <span class="kpi-pct" style="color:#2563eb;">({{ stats.team1_win_pct }}%)</span></p>
+                </div>
+                <div class="h2h-kpi-icon"><img src="{{ url_for('static', filename='images/' + team1_info.logo) }}"></div>
+            </div>
+            
+            <div class="h2h-kpi-card">
+                <div class="h2h-kpi-info">
+                    <h4>{{ team2 }} Wins</h4>
+                    <p class="kpi-val">{{ stats.team2_wins }} <span class="kpi-pct" style="color:#7c3aed;">({{ stats.team2_win_pct }}%)</span></p>
+                </div>
+                <div class="h2h-kpi-icon"><img src="{{ url_for('static', filename='images/' + team2_info.logo) }}"></div>
+            </div>
+            
+            <div class="h2h-kpi-card">
+                <div class="h2h-kpi-info">
+                    <h4>No Result</h4>
+                    <p class="kpi-val">{{ stats.no_result }} <span class="kpi-pct icon-green" style="background:transparent; border:none;">(0.00%)</span></p>
+                </div>
+                <div class="h2h-kpi-icon icon-green"><i class="fa-solid fa-check"></i></div>
+            </div>
+            
+            <div class="h2h-kpi-card">
+                <div class="h2h-kpi-info">
+                    <h4>Tie</h4>
+                    <p class="kpi-val">{{ stats.ties }} <span class="kpi-pct icon-orange" style="background:transparent; border:none;">(0.00%)</span></p>
+                </div>
+                <div class="h2h-kpi-icon icon-orange"><i class="fa-solid fa-star"></i></div>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="h2h-grid">
+            <!-- Win Percentage -->
+            <div class="h2h-card col-span-3">
+                <h4 class="h2h-card-title">Win Percentage</h4>
+                <div class="donut-layout" style="margin-top:20px;">
+                    <div class="donut-side" style="text-align:right;">
+                        <div class="donut-side-val text-t1">{{ stats.team1_win_pct }}%</div>
+                        <div class="donut-side-desc">{{ team1 }}<br>{{ stats.team1_wins }} Wins</div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="winChart"></canvas>
+                        <div class="chart-center-text">
+                            <h4>{{ stats.matches }}</h4>
+                            <span>MATCHES</span>
+                        </div>
+                    </div>
+                    
+                    <div class="donut-side" style="text-align:left;">
+                        <div class="donut-side-val text-t2">{{ stats.team2_win_pct }}%</div>
+                        <div class="donut-side-desc">{{ team2 }}<br>{{ stats.team2_wins }} Wins</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Average Score -->
+            <div class="h2h-card col-span-3">
+                <h4 class="h2h-card-title">Average Score <i class="fa-solid fa-arrow-trend-up" style="color:#2563eb; background:#eff6ff; padding:4px; border-radius:4px; font-size:10px;"></i></h4>
+                <div class="h2h-score-split" style="margin-top: 40px;">
+                    <div class="score-col">
+                        <div class="score-val text-t1">{{ stats.innings1_avg }}</div>
+                        <div class="score-label">1st Innings Avg</div>
+                    </div>
+                    <div class="score-col">
+                        <div class="score-val text-t2">{{ stats.innings2_avg }}</div>
+                        <div class="score-label">2nd Innings Avg</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Highest Team Total -->
+            <div class="h2h-card col-span-2">
+                <h4 class="h2h-card-title">Highest Team Total</h4>
+                <div class="h2h-total-list" style="margin-top: 20px;">
+                    <div class="h2h-total-item">
+                        {% if stats.highest_total_t1 %}
+                        <div class="total-score text-t1">{{ stats.highest_total_t1.score }}</div>
+                        <p class="total-desc">{{ stats.highest_total_t1.desc }}</p>
+                        {% else %}
+                        <div class="total-score text-t1">-</div>
+                        {% endif %}
+                    </div>
+                    <div class="h2h-total-item">
+                        {% if stats.highest_total_t2 %}
+                        <div class="total-score text-t2">{{ stats.highest_total_t2.score }}</div>
+                        <p class="total-desc">{{ stats.highest_total_t2.desc }}</p>
+                        {% else %}
+                        <div class="total-score text-t2">-</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lowest Team Total -->
+            <div class="h2h-card col-span-2">
+                <h4 class="h2h-card-title">Lowest Team Total</h4>
+                <div class="h2h-total-list" style="margin-top: 20px;">
+                    <div class="h2h-total-item">
+                        {% if stats.lowest_total_t1 %}
+                        <div class="total-score text-t1">{{ stats.lowest_total_t1.score }}</div>
+                        <p class="total-desc">{{ stats.lowest_total_t1.desc }}</p>
+                        {% else %}
+                        <div class="total-score text-t1">-</div>
+                        {% endif %}
+                    </div>
+                    <div class="h2h-total-item">
+                        {% if stats.lowest_total_t2 %}
+                        <div class="total-score text-t2">{{ stats.lowest_total_t2.score }}</div>
+                        <p class="total-desc">{{ stats.lowest_total_t2.desc }}</p>
+                        {% else %}
+                        <div class="total-score text-t2">-</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Winner -->
+            <div class="h2h-card col-span-2">
+                <h4 class="h2h-card-title">Recent Winner</h4>
+                <div class="recent-winner-box" style="margin-top: 20px;">
+                    <div class="winner-trophy"><i class="fa-solid fa-trophy"></i></div>
+                    {% if stats.recent_winner %}
+                    <div class="winner-team">{{ stats.recent_winner.team }}</div>
+                    <div class="winner-desc">{{ stats.recent_winner.desc }}<br>{{ stats.recent_winner.date }}</div>
+                    {% else %}
+                    <div class="winner-team">-</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="h2h-grid">
+            <!-- Recent H2H Matches -->
+            <div class="h2h-card col-span-6">
+                <h4 class="h2h-card-title">Recent H2H Matches</h4>
+                <div class="h2h-table-wrapper">
+                    <table class="h2h-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Season</th>
+                                <th>Venue</th>
+                                <th>Winner</th>
+                                <th>Margin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for match in stats.recent_matches %}
+                            <tr>
+                                <td>{{ match.date.split(',')[0] }}<br><span style="font-size:9px;color:#64748b">{{ match.date.split(',')[1] if match.date.count(',') > 0 else '' }}</span></td>
+                                <td>{{ match.season }}</td>
+                                <td>{{ match.venue|truncate(20, true) }}</td>
+                                <td>
+                                    <div class="player-info">
+                                        {% if match.winner == team1_name %}
+                                        <img src="{{ url_for('static', filename='images/' + team1_info.logo) }}" class="team-icon">
+                                        {% elif match.winner == team2_name %}
+                                        <img src="{{ url_for('static', filename='images/' + team2_info.logo) }}" class="team-icon">
+                                        {% endif %}
+                                        {{ match.winner|truncate(15, true) }}
+                                    </div>
+                                </td>
+                                <td class="margin-text">{{ match.margin }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Venue Wise Record -->
+            <div class="h2h-card col-span-6">
+                <h4 class="h2h-card-title">Venue Wise Record</h4>
+                
+                <div class="venue-legend">
+                    <div class="legend-item"><div class="legend-box bg-t1"></div> {{ team1 }} Wins</div>
+                    <div class="legend-item"><div class="legend-box bg-t2"></div> {{ team2 }} Wins</div>
+                    <div class="legend-item"><div class="legend-box bg-nr"></div> No Result</div>
+                </div>
+                
+                {% for v in stats.venue_stats[:5] %}
+                <div class="venue-bar-row">
+                    <div class="venue-name">{{ v.venue|truncate(20, true) }}</div>
+                    <div class="venue-bars">
+                        {% if v.total > 0 %}
+                            {% set w1_pct = (v.wins1 / v.total) * 100 %}
+                            {% set w2_pct = (v.wins2 / v.total) * 100 %}
+                            {% set nr_pct = (v.nr / v.total) * 100 %}
+                            
+                            {% if v.wins1 > 0 %}
+                            <div class="bar-segment bg-t1" style="width: {{ w1_pct }}%"></div>
+                            <span class="bar-val text-t1">{{ v.wins1 }}</span>
+                            {% endif %}
+                            
+                            {% if v.wins2 > 0 %}
+                            <div class="bar-segment bg-t2" style="width: {{ w2_pct }}%"></div>
+                            <span class="bar-val text-t2">{{ v.wins2 }}</span>
+                            {% endif %}
+                            
+                            {% if v.nr > 0 %}
+                            <div class="bar-segment bg-nr" style="width: {{ nr_pct }}%"></div>
+                            <span class="bar-val" style="color:#64748b">{{ v.nr }}</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Top Performers -->
+            <div class="h2h-card col-span-6">
+                <h4 class="h2h-card-title">
+                    Top Performers
+                    <div class="h2h-toggle">
+                        <button id="btnBatting" class="active">Batting</button>
+                        <button id="btnBowling">Bowling</button>
+                    </div>
+                </h4>
+                <div class="h2h-table-wrapper" id="battingTableWrapper">
+                    <table class="h2h-table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Team</th>
+                                <th>Matches</th>
+                                <th>Runs</th>
+                                <th>Avg</th>
+                                <th>SR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in stats.top_batsmen %}
+                            <tr>
+                                <td>
+                                    <div class="player-info">
+                                        <div class="player-avatar"></div>
+                                        {{ p.batter }}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if p.batting_team == team1_name %}
+                                    <img src="{{ url_for('static', filename='images/' + team1_info.logo) }}" class="team-icon">
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='images/' + team2_info.logo) }}" class="team-icon">
+                                    {% endif %}
+                                </td>
+                                <td>{{ p.matches }}</td>
+                                <td>{{ p.runs }}</td>
+                                <td>{{ p.avg }}</td>
+                                <td>{{ p.sr }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="h2h-table-wrapper" id="bowlingTableWrapper" style="display: none;">
+                    <table class="h2h-table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Team</th>
+                                <th>Matches</th>
+                                <th>Wickets</th>
+                                <th>Econ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in stats.top_bowlers %}
+                            <tr>
+                                <td>
+                                    <div class="player-info">
+                                        <div class="player-avatar"></div>
+                                        {{ p.bowler }}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if p.bowling_team == team1_name %}
+                                    <img src="{{ url_for('static', filename='images/' + team1_info.logo) }}" class="team-icon">
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='images/' + team2_info.logo) }}" class="team-icon">
+                                    {% endif %}
+                                </td>
+                                <td>{{ p.matches }}</td>
+                                <td>{{ p.wickets }}</td>
+                                <td>{{ p.econ }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Venue Record Summary -->
+            <div class="h2h-card col-span-6">
+                <h4 class="h2h-card-title">Venue Record <span style="color:#64748b; text-transform:none; font-weight:600">(Summary)</span></h4>
+                <div class="h2h-table-wrapper">
+                    <table class="h2h-table">
+                        <thead>
+                            <tr>
+                                <th>Venue</th>
+                                <th>Matches</th>
+                                <th>{{ team1 }} Wins</th>
+                                <th>{{ team2 }} Wins</th>
+                                <th>Highest Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for v in stats.venue_stats[:4] %}
+                            <tr>
+                                <td>{{ v.venue|truncate(20, true) }}</td>
+                                <td>{{ v.total }}</td>
+                                <td>{{ v.wins1 }}</td>
+                                <td>{{ v.wins2 }}</td>
+                                <td>{{ v.highest }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Row 4 Insights -->
+        <div class="h2h-insights">
+            <div class="insight-brand">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>AI Match Insights</span>
+            </div>
+            
+            <div class="insight-items">
+                {% for insight in stats.insights %}
+                <div class="insight-item">
+                    <div class="insight-circle"><i class="fa-solid fa-check"></i></div>
+                    <p>{{ insight }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
 
     </div>
-
 </section>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Win Percentage Chart
+    var winCtx = document.getElementById('winChart').getContext('2d');
+    
+    // Only render chart if there are matches
+    {% if stats.matches > 0 %}
+    new Chart(winCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['{{ team1 }}', '{{ team2 }}'],
+            datasets: [{
+                data: [{{ stats.team1_wins }}, {{ stats.team2_wins }}],
+                backgroundColor: ['#2563eb', '#7c3aed'],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            },
+            animation: { animateScale: true }
+        }
+    });
+    {% endif %}
+
+    // Compare button logic
+    document.getElementById('compareBtn').addEventListener('click', function () {
+        var t1 = document.getElementById('team1Select').value;
+        var t2 = document.getElementById('team2Select').value;
+        var season = document.getElementById('seasonSelect').value;
+
+        if (t1 === t2) {
+            alert("Please select two different teams.");
+            return;
+        }
+
+        window.location.href = "?team1=" + t1 + "&team2=" + t2 + "&season=" + season;
+    });
+
+    // Swap button logic
+    document.getElementById('swapBtn').addEventListener('click', function () {
+        var t1Select = document.getElementById('team1Select');
+        var t2Select = document.getElementById('team2Select');
+        
+        var temp = t1Select.value;
+        t1Select.value = t2Select.value;
+        t2Select.value = temp;
+        
+        document.getElementById('compareBtn').click();
+    });
+    
+    // Auto-update on season change
+    document.getElementById('seasonSelect').addEventListener('change', function () {
+        document.getElementById('compareBtn').click();
+    });
+
+    // Top Performers Toggle Logic
+    var btnBatting = document.getElementById('btnBatting');
+    var btnBowling = document.getElementById('btnBowling');
+    var battingTableWrapper = document.getElementById('battingTableWrapper');
+    var bowlingTableWrapper = document.getElementById('bowlingTableWrapper');
+
+    btnBatting.addEventListener('click', function() {
+        btnBatting.classList.add('active');
+        btnBowling.classList.remove('active');
+        battingTableWrapper.style.display = 'block';
+        bowlingTableWrapper.style.display = 'none';
+    });
+
+    btnBowling.addEventListener('click', function() {
+        btnBowling.classList.add('active');
+        btnBatting.classList.remove('active');
+        bowlingTableWrapper.style.display = 'block';
+        battingTableWrapper.style.display = 'none';
+    });
+});
+</script>
 
 {% endblock %}

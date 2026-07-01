@@ -1,5 +1,12 @@
 venv/
 __pycache__/
 .vscode/
+.agents/
 
 data/IPL.csv
+data/test.py
+
+static/images/Deccan.jpg
+static/images/GL.jpg
+static/images/pune.jpg
+static/images/RSP.jpg

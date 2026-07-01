@@ -99,16 +99,10 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link {% if active_page=='match_insights' %}active{% endif %}"
-                       href="{{ url_for('match_insights') }}">
-                        Match Insights
-                    </a>
-                </li>
 
                 <li class="nav-item">
                     <a class="nav-link"
-                       href="/#champions">
+                       href="{{ url_for('winners') }}">
                         Champions
                     </a>
                 </li>
@@ -205,8 +199,8 @@
                 <ul class="footer-links">
 
                     <li>
-                        <a href="{{ url_for('match_insights') }}">
-                            Match Insights
+                        <a href="{{ url_for('h2h') }}">
+                            H2H Analytics
                         </a>
                     </li>
 

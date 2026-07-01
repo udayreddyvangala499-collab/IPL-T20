@@ -6,72 +6,154 @@ About
 
 {% block content %}
 
-<div class="page-header">
-    <h1>📊 About IPL Analytics Dashboard</h1>
+<!-- PAGE HEADER -->
+
+<section class="page-header">
+    <div class="container-xl">
+        <h1>About IPL Analytics Dashboard</h1>
+        <p>
+            A comprehensive cricket analytics platform
+            for Indian Premier League data.
+        </p>
+    </div>
+</section>
+
+<!-- CONTENT -->
+
+<section class="container-xl mb-5">
+
+<div class="stats-wrapper">
+
+    <!-- Overview -->
+
+    <div class="card-custom">
+
+        <h3>Project Overview</h3>
+
+        <p>
+            IPL Analytics Dashboard is a comprehensive cricket analytics platform
+            designed to provide data-driven insights from Indian Premier League (IPL)
+            matches. The application transforms raw match data into meaningful
+            statistics, visualizations, and performance metrics for teams,
+            players, and seasons.
+        </p>
+
+        <p>
+            The platform enables users to explore team performance, player
+            statistics, head-to-head rivalries, venue-based records, and
+            season-wise insights through an intuitive and interactive interface.
+        </p>
+
+    </div>
+
+    <!-- Features -->
+
+    <div class="card-custom">
+
+        <h3>Key Features</h3>
+
+        <div class="records-grid">
+
+            <div class="record-box">
+                <h4><i class="fa-solid fa-people-group"></i></h4>
+                <p>Team Analytics</p>
+            </div>
+
+            <div class="record-box">
+                <h4><i class="fa-solid fa-user"></i></h4>
+                <p>Player Statistics</p>
+            </div>
+
+            <div class="record-box">
+                <h4><i class="fa-solid fa-bolt"></i></h4>
+                <p>H2H Comparisons</p>
+            </div>
+
+            <div class="record-box">
+                <h4><i class="fa-solid fa-location-dot"></i></h4>
+                <p>Venue Analysis</p>
+            </div>
+
+            <div class="record-box">
+                <h4><i class="fa-solid fa-chart-line"></i></h4>
+                <p>Performance Trends</p>
+            </div>
+
+            <div class="record-box">
+                <h4><i class="fa-solid fa-trophy"></i></h4>
+                <p>Champions History</p>
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="card">
+<!-- Technology + Purpose -->
 
-    <h2>Project Overview</h2>
+<div class="stats-wrapper mt-4">
 
-    <p>
-        IPL Analytics Dashboard is a comprehensive cricket analytics platform
-        designed to provide data-driven insights from Indian Premier League (IPL)
-        matches. The application transforms raw match data into meaningful
-        statistics, visualizations, and performance metrics for teams,
-        players, and seasons.
-    </p>
+    <!-- Tech Stack -->
 
-    <p>
-        The platform enables users to explore team performance, player
-        statistics, head-to-head rivalries, venue-based records, and
-        season-wise insights through an intuitive and interactive interface.
-    </p>
+    <div class="card-custom">
+
+        <h3>Technology Stack</h3>
+
+        <div class="record-row">
+            <span>Backend</span>
+            <strong>Python / Flask</strong>
+        </div>
+
+        <div class="record-row">
+            <span>Data Processing</span>
+            <strong>Pandas</strong>
+        </div>
+
+        <div class="record-row">
+            <span>Frontend</span>
+            <strong>HTML5 / CSS3</strong>
+        </div>
+
+        <div class="record-row">
+            <span>Templates</span>
+            <strong>Jinja2</strong>
+        </div>
+
+        <div class="record-row">
+            <span>Framework</span>
+            <strong>Bootstrap 5.3</strong>
+        </div>
+
+        <div class="record-row">
+            <span>Charts</span>
+            <strong>Chart.js</strong>
+        </div>
+
+    </div>
+
+    <!-- Purpose -->
+
+    <div class="card-custom">
+
+        <h3>Purpose</h3>
+
+        <p>
+            This dashboard was developed to demonstrate the practical application
+            of data analytics and web development in sports analytics. It provides
+            cricket enthusiasts, analysts, and researchers with a centralized
+            platform for exploring IPL performance trends and historical records.
+        </p>
+
+        <p>
+            All statistics are sourced from ball-by-ball IPL match data
+            covering seasons from 2008 to 2025.
+        </p>
+
+    </div>
 
 </div>
 
-<div class="card">
-
-    <h2>Key Features</h2>
-
-    <ul>
-        <li>🏏 Team Analytics and Venue Performance</li>
-        <li>👤 Player Batting, Bowling, and Fielding Statistics</li>
-        <li>🤝 Head-to-Head Team Comparisons</li>
-        <li>🏟 Venue-Based Performance Analysis</li>
-        <li>📈 Season-Wise Match Insights</li>
-        <li>⭐ Top Batting, Bowling, and Fielding Performers</li>
-        <li>📊 Interactive Data Exploration</li>
-    </ul>
-
-</div>
-
-<div class="card">
-
-    <h2>Technology Stack</h2>
-
-    <ul>
-        <li>Python</li>
-        <li>Flask</li>
-        <li>Pandas</li>
-        <li>HTML5</li>
-        <li>CSS3</li>
-        <li>Jinja2 Templates</li>
-    </ul>
-
-</div>
-
-<div class="card">
-
-    <h2>Purpose</h2>
-
-    <p>
-        This dashboard was developed to demonstrate the practical application
-        of data analytics and web development in sports analytics. It provides
-        cricket enthusiasts, analysts, and researchers with a centralized
-        platform for exploring IPL performance trends and historical records.
-    </p>
-
-</div>
+</section>
 
 {% endblock %}

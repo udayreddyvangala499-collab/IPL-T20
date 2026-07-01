@@ -5,6 +5,8 @@ from flask import (
     request,
     redirect
 )
+
+from utils.h2h_analytics import get_teams, get_h2h_stats
 import pandas as pd
 
 import pandas as pd
@@ -83,7 +85,7 @@ TEAM_NAME_MAP = {
     "LSG": "Lucknow Super Giants",
     "GT": "Gujarat Titans"
 }
-RECENT_CHAMPIONS = [
+ALL_CHAMPIONS = [
     {
         "year": 2025,
         "team": "Royal Challengers Bengaluru",
@@ -103,8 +105,80 @@ RECENT_CHAMPIONS = [
         "year": 2022,
         "team": "Gujarat Titans",
         "logo": "GT.jpg"
+    },
+    {
+        "year": 2021,
+        "team": "Chennai Super Kings",
+        "logo": "CSK.png"
+    },
+    {
+        "year": 2020,
+        "team": "Mumbai Indians",
+        "logo": "MI.jpg"
+    },
+    {
+        "year": 2019,
+        "team": "Mumbai Indians",
+        "logo": "MI.jpg"
+    },
+    {
+        "year": 2018,
+        "team": "Chennai Super Kings",
+        "logo": "CSK.png"
+    },
+    {
+        "year": 2017,
+        "team": "Mumbai Indians",
+        "logo": "MI.jpg"
+    },
+    {
+        "year": 2016,
+        "team": "Sunrisers Hyderabad",
+        "logo": "SRH.png"
+    },
+    {
+        "year": 2015,
+        "team": "Mumbai Indians",
+        "logo": "MI.jpg"
+    },
+    {
+        "year": 2014,
+        "team": "Kolkata Knight Riders",
+        "logo": "KKR.png"
+    },
+    {
+        "year": 2013,
+        "team": "Mumbai Indians",
+        "logo": "MI.jpg"
+    },
+    {
+        "year": 2012,
+        "team": "Kolkata Knight Riders",
+        "logo": "KKR.png"
+    },
+    {
+        "year": 2011,
+        "team": "Chennai Super Kings",
+        "logo": "CSK.png"
+    },
+    {
+        "year": 2010,
+        "team": "Chennai Super Kings",
+        "logo": "CSK.png"
+    },
+    {
+        "year": 2009,
+        "team": "Deccan Chargers",
+        "logo": "SRH.png"
+    },
+    {
+        "year": 2008,
+        "team": "Rajasthan Royals",
+        "logo": "RR.jpg"
     }
 ]
+
+RECENT_CHAMPIONS = ALL_CHAMPIONS[:4]
 
 # ==========================================
 # HOME
@@ -788,37 +862,57 @@ def player_details(player):
 # H2H PAGE
 # ==========================================
 
+
 @app.route("/h2h")
 def h2h():
 
-    teams = sorted(
-        pd.concat(
-            [
-                df["batting_team"],
-                df["bowling_team"]
-            ]
-        ).dropna().unique()
-    )
+    ESTABLISHED_MAP = {
+        "Chennai Super Kings": 2008,
+        "Mumbai Indians": 2008,
+        "Royal Challengers Bengaluru": 2008,
+        "Kolkata Knight Riders": 2008,
+        "Sunrisers Hyderabad": 2013,
+        "Rajasthan Royals": 2008,
+        "Delhi Capitals": 2008,
+        "Punjab Kings": 2008,
+        "Lucknow Super Giants": 2022,
+        "Gujarat Titans": 2022
+    }
+
+    team_names = get_teams()
+    teams_list = []
+    for t_name in team_names:
+        sh_name = SHORT_NAMES.get(t_name, t_name)
+        teams_list.append({
+            "name": t_name,
+            "short_name": sh_name,
+            "logo": LOGO_MAP.get(t_name, "IPL1.jpg"),
+            "established": ESTABLISHED_MAP.get(t_name, 2008)
+        })
+
+    team1_short = request.args.get("team1", "CSK")
+    team2_short = request.args.get("team2", "MI")
+    season = request.args.get("season", "All IPL Seasons")
+
+    team1_full = TEAM_NAME_MAP.get(team1_short, team1_short)
+    team2_full = TEAM_NAME_MAP.get(team2_short, team2_short)
+
+    stats = get_h2h_stats(team1_full, team2_full, season)
+    
+    t1_info = next((t for t in teams_list if t["short_name"] == team1_short), {})
+    t2_info = next((t for t in teams_list if t["short_name"] == team2_short), {})
 
     return render_template(
         "h2h.html",
-        teams=teams
-    )
-
-# ==========================================
-# MATCH INSIGHTS
-# ==========================================
-
-@app.route("/match-insights")
-def match_insights():
-
-    venues = sorted(
-        df["venue"].dropna().unique()
-    )
-
-    return render_template(
-        "match_insights.html",
-        venues=venues
+        teams=teams_list,
+        team1=team1_short,
+        team2=team2_short,
+        team1_name=team1_full,
+        team2_name=team2_full,
+        team1_info=t1_info,
+        team2_info=t2_info,
+        season=season,
+        stats=stats
     )
 
 # ==========================================
@@ -830,6 +924,18 @@ def about():
 
     return render_template(
         "about.html"
+    )
+
+# ==========================================
+# WINNERS / CHAMPIONS
+# ==========================================
+
+@app.route("/winners")
+def winners():
+
+    return render_template(
+        "winners.html",
+        champions=ALL_CHAMPIONS
     )
 
 # ==========================================
