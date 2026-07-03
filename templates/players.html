@@ -4,6 +4,10 @@
 Player Analytics
 {% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/players.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="players-topbar">
 
@@ -29,17 +33,24 @@ Player Analytics
             action="{{ url_for('players') }}"
         >
 
-            <input
-                type="text"
-                name="search"
-                placeholder="Search Player..."
-            >
+            <div class="search-input-container">
+                <i class="fa-solid fa-search search-icon-left"></i>
+                <input
+                    type="text"
+                    name="search"
+                    id="playerSearchInput"
+                    placeholder="Search Player..."
+                    autocomplete="off"
+                >
+            </div>
 
             <button type="submit">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
 
         </form>
+
+        <div id="autocompleteList" class="autocomplete-suggestions"></div>
 
     </div>
 
@@ -227,6 +238,8 @@ Player Analytics
                                 <th>Strike Rate</th>
                                 <th>100s</th>
                                 <th>50s</th>
+                                <th>4s</th>
+                                <th>6s</th>
                                 <th>Highest Score</th>
 
                             </tr>
@@ -246,12 +259,120 @@ Player Analytics
                                 <td>{{ row.strike_rate }}</td>
                                 <td>{{ row.centuries }}</td>
                                 <td>{{ row.fifties }}</td>
+                                <td>{{ row.fours }}</td>
+                                <td>{{ row.sixes }}</td>
                                 <td>{{ row.highest_score }}</td>
 
                             </tr>
 
                             {% endfor %}
 
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <!-- BOWLING SEASON TABLE -->
+
+            <div class="table-card season-card">
+
+                <h3>
+                    Season-wise Bowling Performance
+                </h3>
+
+                <div class="table-responsive">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Season</th>
+                                <th>Matches</th>
+                                <th>Wickets</th>
+                                <th>Runs</th>
+                                <th>Economy</th>
+                                <th>Average</th>
+                                <th>Strike Rate</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            {% if bowling_season_stats %}
+                                {% for row in bowling_season_stats %}
+
+                                <tr>
+
+                                    <td>{{ row.season }}</td>
+                                    <td>{{ row.matches }}</td>
+                                    <td>{{ row.wickets }}</td>
+                                    <td>{{ row.runs }}</td>
+                                    <td>{{ row.economy }}</td>
+                                    <td>{{ row.average }}</td>
+                                    <td>{{ row.strike_rate }}</td>
+
+                                </tr>
+
+                                {% endfor %}
+                            {% else %}
+                                <tr><td colspan="7" class="text-muted" style="text-align:center;">No Bowling Data</td></tr>
+                            {% endif %}
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <!-- FIELDING SEASON TABLE -->
+
+            <div class="table-card season-card">
+
+                <h3>
+                    Season-wise Fielding Performance
+                </h3>
+
+                <div class="table-responsive">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Season</th>
+                                <th>Catches</th>
+                                <th>Run Outs</th>
+                                <th>Stumpings</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            {% if fielding_season_stats %}
+                                {% for row in fielding_season_stats %}
+
+                                <tr>
+
+                                    <td>{{ row.season }}</td>
+                                    <td>{{ row.catches }}</td>
+                                    <td>{{ row.run_outs }}</td>
+                                    <td>{{ row.stumpings }}</td>
+
+                                </tr>
+
+                                {% endfor %}
+                            {% else %}
+                                <tr><td colspan="4" class="text-muted" style="text-align:center;">No Fielding Data</td></tr>
+                            {% endif %}
                         </tbody>
 
                     </table>
@@ -373,5 +494,60 @@ Player Analytics
     </div>
 
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var input = document.getElementById("playerSearchInput");
+    var box   = document.getElementById("autocompleteList");
+
+    if (!input || !box) return;
+
+    var timer = null;
+
+    input.addEventListener("input", function () {
+        var q = this.value.trim();
+        clearTimeout(timer);
+        box.innerHTML = "";
+        box.style.display = "none";
+
+        if (q.length < 1) return;
+
+        timer = setTimeout(function () {
+            fetch("/api/players-suggest?q=" + encodeURIComponent(q))
+                .then(function (r) { return r.json(); })
+                .then(function (names) {
+                    box.innerHTML = "";
+                    if (names.length === 0) {
+                        box.style.display = "none";
+                        return;
+                    }
+                    names.forEach(function (name) {
+                        var d = document.createElement("div");
+                        d.className = "autocomplete-suggestion";
+                        d.textContent = name;
+                        d.addEventListener("mousedown", function (e) {
+                            e.preventDefault();
+                            input.value = name;
+                            box.innerHTML = "";
+                            box.style.display = "none";
+                            input.closest("form").submit();
+                        });
+                        box.appendChild(d);
+                    });
+                    box.style.display = "block";
+                })
+                .catch(function () {
+                    box.style.display = "none";
+                });
+        }, 200);
+    });
+
+    input.addEventListener("blur", function () {
+        setTimeout(function () {
+            box.style.display = "none";
+        }, 200);
+    });
+});
+</script>
 
 {% endblock %}

@@ -85,100 +85,53 @@ TEAM_NAME_MAP = {
     "LSG": "Lucknow Super Giants",
     "GT": "Gujarat Titans"
 }
-ALL_CHAMPIONS = [
-    {
-        "year": 2025,
-        "team": "Royal Challengers Bengaluru",
-        "logo": "RCB.jpg"
-    },
-    {
-        "year": 2024,
-        "team": "Kolkata Knight Riders",
-        "logo": "KKR.png"
-    },
-    {
-        "year": 2023,
-        "team": "Chennai Super Kings",
-        "logo": "CSK.png"
-    },
-    {
-        "year": 2022,
-        "team": "Gujarat Titans",
-        "logo": "GT.jpg"
-    },
-    {
-        "year": 2021,
-        "team": "Chennai Super Kings",
-        "logo": "CSK.png"
-    },
-    {
-        "year": 2020,
-        "team": "Mumbai Indians",
-        "logo": "MI.jpg"
-    },
-    {
-        "year": 2019,
-        "team": "Mumbai Indians",
-        "logo": "MI.jpg"
-    },
-    {
-        "year": 2018,
-        "team": "Chennai Super Kings",
-        "logo": "CSK.png"
-    },
-    {
-        "year": 2017,
-        "team": "Mumbai Indians",
-        "logo": "MI.jpg"
-    },
-    {
-        "year": 2016,
-        "team": "Sunrisers Hyderabad",
-        "logo": "SRH.png"
-    },
-    {
-        "year": 2015,
-        "team": "Mumbai Indians",
-        "logo": "MI.jpg"
-    },
-    {
-        "year": 2014,
-        "team": "Kolkata Knight Riders",
-        "logo": "KKR.png"
-    },
-    {
-        "year": 2013,
-        "team": "Mumbai Indians",
-        "logo": "MI.jpg"
-    },
-    {
-        "year": 2012,
-        "team": "Kolkata Knight Riders",
-        "logo": "KKR.png"
-    },
-    {
-        "year": 2011,
-        "team": "Chennai Super Kings",
-        "logo": "CSK.png"
-    },
-    {
-        "year": 2010,
-        "team": "Chennai Super Kings",
-        "logo": "CSK.png"
-    },
-    {
-        "year": 2009,
-        "team": "Deccan Chargers",
-        "logo": "SRH.png"
-    },
-    {
-        "year": 2008,
-        "team": "Rajasthan Royals",
-        "logo": "RR.jpg"
-    }
-]
+ALL_CHAMPIONS = []
+
+if not df.empty and 'stage' in df.columns:
+    try:
+        finals = df[df['stage'] == 'Final'].drop_duplicates('season')
+        for _, row in finals.sort_values('season', ascending=False, key=lambda x: x.astype(str)).iterrows():
+            season_str = str(row['season'])
+            year = int(season_str[-2:]) + 2000 if '/' in season_str else int(season_str)
+            ALL_CHAMPIONS.append({
+                "year": year,
+                "team": row['match_won_by'],
+                "logo": LOGO_MAP.get(row['match_won_by'], 'IPL1.jpg')
+            })
+    except Exception as e:
+        print("Error calculating champions:", e)
 
 RECENT_CHAMPIONS = ALL_CHAMPIONS[:4]
+
+TEAM_CAPTAINS = {
+    "Chennai Super Kings": "MS Dhoni",
+    "Mumbai Indians": "Rohit Sharma",
+    "Royal Challengers Bengaluru": "Virat Kohli",
+    "Kolkata Knight Riders": "Shreyas Iyer",
+    "Sunrisers Hyderabad": "Pat Cummins",
+    "Rajasthan Royals": "Sanju Samson",
+    "Delhi Capitals": "Rishabh Pant",
+    "Punjab Kings": "Shikhar Dhawan",
+    "Lucknow Super Giants": "KL Rahul",
+    "Gujarat Titans": "Shubman Gill"
+}
+
+ORANGE_CAPS = {}
+PURPLE_CAPS = {}
+
+if not df.empty and 'season' in df.columns:
+    try:
+        season_runs = df.groupby(['season', 'batter', 'batting_team'])['batter_runs'].sum().reset_index()
+        top_batters = season_runs.loc[season_runs.groupby('season')['batter_runs'].idxmax()]
+        for _, row in top_batters.iterrows():
+            ORANGE_CAPS[row['season']] = {"player": row['batter'], "team": row['batting_team'], "runs": int(row['batter_runs'])}
+            
+        season_wickets = df.groupby(['season', 'bowler', 'bowling_team'])['bowler_wicket'].sum().reset_index()
+        top_bowlers = season_wickets.loc[season_wickets.groupby('season')['bowler_wicket'].idxmax()]
+        for _, row in top_bowlers.iterrows():
+            PURPLE_CAPS[row['season']] = {"player": row['bowler'], "team": row['bowling_team'], "wickets": int(row['bowler_wicket'])}
+    except Exception as e:
+        print("Error calculating caps:", e)
 
 # ==========================================
 # HOME
@@ -398,12 +351,12 @@ def team_details(team):
 
     bowling = {
         "average": round(
-            bowling_df["runs_total"].sum() / wickets,
+            bowling_df["runs_bowler"].sum() / wickets,
             2
         ) if wickets else 0,
 
         "economy": round(
-            bowling_df["runs_total"].sum() / overs,
+            bowling_df["runs_bowler"].sum() / overs,
             2
         ) if overs else 0,
 
@@ -413,7 +366,7 @@ def team_details(team):
             (
                 len(
                     bowling_df[
-                        bowling_df["runs_total"] == 0
+                        bowling_df["runs_bowler"] == 0
                     ]
                 )
                 / len(bowling_df)
@@ -477,6 +430,52 @@ def team_details(team):
             "result": "-"
         }
 
+    # ==========================================
+    # NEW DATA EXTRACTS
+    # ==========================================
+    
+    # 1. Champions
+    champions = [c["year"] for c in ALL_CHAMPIONS if c["team"] == team]
+    
+    # 2. Top 5 Scorers (Orange Cap style)
+    try:
+        top_scorers = (
+            batting_df.groupby("batter")["batter_runs"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .reset_index()
+        )
+        top_5_scorers = [
+            {"name": row["batter"], "runs": int(row["batter_runs"])}
+            for _, row in top_scorers.iterrows()
+        ]
+    except:
+        top_5_scorers = []
+    
+    # 3. Top 5 Wicket Takers (Purple Cap style)
+    try:
+        top_bowlers = (
+            bowling_df.groupby("bowler")["bowler_wicket"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(5)
+            .reset_index()
+        )
+        top_5_wicket_takers = [
+            {"name": row["bowler"], "wickets": int(row["bowler_wicket"])}
+            for _, row in top_bowlers.iterrows()
+        ]
+    except:
+        top_5_wicket_takers = []
+    
+    # 4. Top 3 Main Players
+    top_players = [
+        {"title": "Top Scorer", "name": most_runs_scorer, "stat": f"{total_runs} Runs"},
+        {"title": "Top Wicket Taker", "name": most_wicket_taker, "stat": f"{wickets} Wickets"},
+        {"title": "Highest Total", "name": selected_team["name"], "stat": f"{highest_total} Runs"}
+    ]
+
     teams = []
 
     for team_name in SHORT_NAMES.keys():
@@ -494,7 +493,11 @@ def team_details(team):
         batting=batting,
         bowling=bowling,
         records=records,
-        recent_match=recent_match
+        recent_match=recent_match,
+        champions=champions,
+        top_5_scorers=top_5_scorers,
+        top_5_wicket_takers=top_5_wicket_takers,
+        top_players=top_players
     )
 
 # ==========================================
@@ -531,6 +534,17 @@ def players():
             )
 
     return player_details("V Kohli")
+
+# PLAYER SEARCH AUTOCOMPLETE API
+@app.route("/api/players-suggest")
+def players_suggest():
+    from flask import jsonify
+    query = request.args.get("q", "").strip().lower()
+    if not query or len(query) < 1:
+        return jsonify([])
+    all_players = sorted(df["batter"].dropna().unique())
+    matches = [p for p in all_players if query in p.lower()][:10]
+    return jsonify(matches)
 
 @app.route("/players/<player>")
 def player_details(player):
@@ -766,8 +780,54 @@ def player_details(player):
 
             "highest_score": int(
                 season_scores.max()
-            ) if not season_scores.empty else 0
+            ) if not season_scores.empty else 0,
+            
+            "fours": int(
+                (season_df["runs_batter"] == 4).sum()
+            ),
+            
+            "sixes": int(
+                (season_df["runs_batter"] == 6).sum()
+            )
         })
+
+    # ==========================================
+    # BOWLING SEASON STATS
+    # ==========================================
+    bowling_season_stats = []
+    if not bowling_df.empty:
+        for season in sorted(bowling_df["season"].dropna().unique(), reverse=True):
+            s_df = bowling_df[bowling_df["season"] == season]
+            s_matches = s_df["match_id"].nunique()
+            s_wickets = int(s_df["bowler_wicket"].sum())
+            s_balls = int(s_df["valid_ball"].sum())
+            s_runs = int(s_df["runs_bowler"].sum())
+            s_overs = s_balls / 6 if s_balls else 0
+            
+            bowling_season_stats.append({
+                "season": season,
+                "matches": s_matches,
+                "wickets": s_wickets,
+                "runs": s_runs,
+                "economy": round(s_runs / s_overs, 2) if s_overs else 0,
+                "average": round(s_runs / s_wickets, 2) if s_wickets else 0,
+                "strike_rate": round(s_balls / s_wickets, 2) if s_wickets else 0
+            })
+
+    # ==========================================
+    # FIELDING SEASON STATS
+    # ==========================================
+    fielding_season_stats = []
+    fielding_df = df[df["fielders"].str.contains(player, na=False, regex=False)]
+    if not fielding_df.empty:
+        for season in sorted(fielding_df["season"].dropna().unique(), reverse=True):
+            f_df = fielding_df[fielding_df["season"] == season]
+            fielding_season_stats.append({
+                "season": season,
+                "catches": int((f_df["wicket_kind"] == "caught").sum()),
+                "run_outs": int((f_df["wicket_kind"] == "run out").sum()),
+                "stumpings": int((f_df["wicket_kind"] == "stumped").sum())
+            })
 
       # ==========================================
     # RECENT INNINGS
@@ -855,6 +915,8 @@ def player_details(player):
         batting=batting,
         bowling=bowling,
         season_stats=season_stats,
+        bowling_season_stats=bowling_season_stats,
+        fielding_season_stats=fielding_season_stats,
         recent_innings=recent_innings,
         records=records
     )

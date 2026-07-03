@@ -4,6 +4,10 @@
 Teams Analytics
 {% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/teams.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <section class="page-header">
@@ -251,9 +255,80 @@ Teams Analytics
 
 </div>
 
-</div>
+<!-- MIDDLE SECTION (Champions & Main Players) -->
+<div class="middle-section">
+
+    <!-- CHAMPIONS ROW -->
+    <div class="champions-row-card card-custom">
+        <h3>🏆 Champions</h3>
+        <div class="champions-badges">
+            {% if champions %}
+                {% for year in champions %}
+                <span class="champion-badge">{{ year }}</span>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No Championships Yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- MAIN PLAYERS -->
+    <div class="card-custom highlight-card">
+        <h3>⭐ Main Players</h3>
+        <div class="card-body-scroll">
+            {% for p in top_players %}
+            <div class="record-row">
+                <span>{{ p.title }}</span>
+                <strong>{{ p.name }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 
 </div>
+
+<!-- ORANGE & PURPLE CAPS ROW -->
+<div class="caps-row">
+
+    <!-- ORANGE CAP — Top 5 Scorers -->
+    <div class="card-custom highlight-card orange-card">
+        <h3>🟠 Top 5 Scorers</h3>
+        <div class="card-body-scroll">
+            {% if top_5_scorers %}
+                {% for s in top_5_scorers %}
+                <div class="record-row">
+                    <span>{{ loop.index }}. {{ s.name }}</span>
+                    <strong>{{ s.runs }} Runs</strong>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No Data</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- PURPLE CAP — Top 5 Wicket Takers -->
+    <div class="card-custom highlight-card purple-card">
+        <h3>🟣 Top 5 Wicket Takers</h3>
+        <div class="card-body-scroll">
+            {% if top_5_wicket_takers %}
+                {% for w in top_5_wicket_takers %}
+                <div class="record-row">
+                    <span>{{ loop.index }}. {{ w.name }}</span>
+                    <strong>{{ w.wickets }} Wkts</strong>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No Data</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+</div> <!-- END OF CONTENT -->
+
+</div> <!-- END OF LAYOUT -->
 
 </div>
 </section>

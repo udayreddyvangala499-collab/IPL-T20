@@ -135,8 +135,11 @@ def get_h2h_stats(team1, team2, season="All IPL Seasons"):
             }
 
     # Recent Match
+    # First ensure date is datetime for correct chronological sorting
+    h2h_temp = h2h.copy()
+    h2h_temp["date"] = pd.to_datetime(h2h_temp["date"], format='mixed', dayfirst=True)
     recent_matches = (
-        h2h.drop_duplicates(subset=["match_id"])
+        h2h_temp.drop_duplicates(subset=["match_id"])
         .sort_values(by="date", ascending=False)
     )
     
@@ -193,8 +196,8 @@ def get_h2h_stats(team1, team2, season="All IPL Seasons"):
     # Top Performers (Batting)
     batting = h2h.groupby(["batter", "batting_team"]).agg(
         matches=("match_id", "nunique"),
-        runs=("batter_runs", "sum"),
-        balls=("balls_faced", "sum"),
+        runs=("runs_batter", "sum"),
+        balls=("valid_ball", "sum"),
         outs=("player_out", "count")
     ).reset_index()
     

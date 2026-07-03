@@ -4,17 +4,33 @@
 H2H Analytics
 {% endblock %}
 
-{% block content %}
+{% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/h2h_new.css') }}">
+{% endblock %}
 
+{% block content %}
 <section class="h2h-dashboard">
     <div class="container-xl">
 
         <!-- Top Header -->
-        <div class="h2h-top-header" style="margin-bottom: 24px;">
-            <div>
-                <h2>H2H Analytics</h2>
-                <p>Head-to-Head Team Comparison and Statistics</p>
+        <div class="h2h-top-header-wrapper">
+            <div class="h2h-top-header">
+                <div>
+                    <h2>H2H Analytics</h2>
+                    <p>Head-to-Head Team Comparison and Statistics</p>
+                </div>
+                <div class="h2h-top-actions">
+                    <div class="h2h-select-format">
+                        <label>Select Format</label>
+                        <select id="seasonSelectTop">
+                            <option value="All IPL Seasons" {% if season == 'All IPL Seasons' %}selected{% endif %}>All IPL Seasons</option>
+                            {% for s in stats.seasons %}
+                            <option value="{{ s }}" {% if season|string == s|string %}selected{% endif %}>IPL {{ s }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="h2h-btn-export"><i class="fa-solid fa-arrow-up-right-from-square"></i> Export</button>
+                </div>
             </div>
         </div>
 
@@ -33,7 +49,11 @@ H2H Analytics
                 </div>
             </div>
             
-            <div class="h2h-vs-circle">VS</div>
+            <div class="h2h-vs-section">
+                <div class="h2h-vs-line-left"></div>
+                <div class="h2h-vs-circle">VS</div>
+                <div class="h2h-vs-line-right"></div>
+            </div>
             
             <div class="h2h-team-banner h2h-team2-banner">
                 <div class="h2h-banner-content">
@@ -50,7 +70,7 @@ H2H Analytics
         </div>
 
         <!-- Selectors Row -->
-        <div class="h2h-selectors-row">
+        <div class="h2h-selectors-row-card">
             <div class="h2h-select-group">
                 <label>Select Team 1</label>
                 <select id="team1Select">
@@ -73,59 +93,67 @@ H2H Analytics
                 </select>
             </div>
             
-            <div class="h2h-select-group" style="margin-left: 16px;">
-                <label>Select Season</label>
-                <select id="seasonSelect">
-                    <option value="All IPL Seasons" {% if season == 'All IPL Seasons' %}selected{% endif %}>All IPL Seasons</option>
-                    {% for s in stats.seasons %}
-                    <option value="{{ s }}" {% if season|string == s|string %}selected{% endif %}>IPL {{ s }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
             <button class="h2h-compare-btn-new" id="compareBtn">Compare</button>
         </div>
 
         <!-- KPI Row -->
-        <div class="h2h-kpi-row">
-            <div class="h2h-kpi-card">
-                <div class="h2h-kpi-info">
+        <div class="h2h-kpi-unified-card">
+            <div class="h2h-kpi-item">
+                <div class="h2h-kpi-header">
                     <h4>Total Matches</h4>
+                </div>
+                <div class="h2h-kpi-body">
                     <p class="kpi-val">{{ stats.matches }}</p>
+                    <div class="h2h-kpi-icon-small icon-blue"><i class="fa-regular fa-calendar-days"></i></div>
                 </div>
-                <div class="h2h-kpi-icon icon-blue"><i class="fa-regular fa-calendar-days"></i></div>
             </div>
             
-            <div class="h2h-kpi-card">
-                <div class="h2h-kpi-info">
+            <div class="h2h-kpi-divider"></div>
+
+            <div class="h2h-kpi-item">
+                <div class="h2h-kpi-header">
                     <h4>{{ team1 }} Wins</h4>
+                </div>
+                <div class="h2h-kpi-body">
                     <p class="kpi-val">{{ stats.team1_wins }} <span class="kpi-pct" style="color:#2563eb;">({{ stats.team1_win_pct }}%)</span></p>
+                    <div class="h2h-kpi-icon-small"><img src="{{ url_for('static', filename='images/' + team1_info.logo) }}"></div>
                 </div>
-                <div class="h2h-kpi-icon"><img src="{{ url_for('static', filename='images/' + team1_info.logo) }}"></div>
             </div>
             
-            <div class="h2h-kpi-card">
-                <div class="h2h-kpi-info">
+            <div class="h2h-kpi-divider"></div>
+
+            <div class="h2h-kpi-item">
+                <div class="h2h-kpi-header">
                     <h4>{{ team2 }} Wins</h4>
+                </div>
+                <div class="h2h-kpi-body">
                     <p class="kpi-val">{{ stats.team2_wins }} <span class="kpi-pct" style="color:#7c3aed;">({{ stats.team2_win_pct }}%)</span></p>
+                    <div class="h2h-kpi-icon-small"><img src="{{ url_for('static', filename='images/' + team2_info.logo) }}"></div>
                 </div>
-                <div class="h2h-kpi-icon"><img src="{{ url_for('static', filename='images/' + team2_info.logo) }}"></div>
             </div>
             
-            <div class="h2h-kpi-card">
-                <div class="h2h-kpi-info">
+            <div class="h2h-kpi-divider"></div>
+
+            <div class="h2h-kpi-item">
+                <div class="h2h-kpi-header">
                     <h4>No Result</h4>
-                    <p class="kpi-val">{{ stats.no_result }} <span class="kpi-pct icon-green" style="background:transparent; border:none;">(0.00%)</span></p>
                 </div>
-                <div class="h2h-kpi-icon icon-green"><i class="fa-solid fa-check"></i></div>
+                <div class="h2h-kpi-body">
+                    <p class="kpi-val">{{ stats.no_result }} <span class="kpi-pct icon-green-text">(0.00%)</span></p>
+                    <div class="h2h-kpi-icon-small icon-green"><i class="fa-solid fa-check"></i></div>
+                </div>
             </div>
             
-            <div class="h2h-kpi-card">
-                <div class="h2h-kpi-info">
+            <div class="h2h-kpi-divider"></div>
+
+            <div class="h2h-kpi-item">
+                <div class="h2h-kpi-header">
                     <h4>Tie</h4>
-                    <p class="kpi-val">{{ stats.ties }} <span class="kpi-pct icon-orange" style="background:transparent; border:none;">(0.00%)</span></p>
                 </div>
-                <div class="h2h-kpi-icon icon-orange"><i class="fa-solid fa-star"></i></div>
+                <div class="h2h-kpi-body">
+                    <p class="kpi-val">{{ stats.ties }} <span class="kpi-pct icon-orange-text">(0.00%)</span></p>
+                    <div class="h2h-kpi-icon-small icon-orange"><i class="fa-solid fa-star"></i></div>
+                </div>
             </div>
         </div>
 
@@ -425,10 +453,10 @@ H2H Analytics
         </div>
         
         <!-- Row 4 Insights -->
-        <div class="h2h-insights">
+        <div class="h2h-insights-card">
             <div class="insight-brand">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <span>AI Match Insights</span>
+                <div class="insight-brand-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <span>AI MATCH INSIGHTS</span>
             </div>
             
             <div class="insight-items">
@@ -481,7 +509,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('compareBtn').addEventListener('click', function () {
         var t1 = document.getElementById('team1Select').value;
         var t2 = document.getElementById('team2Select').value;
-        var season = document.getElementById('seasonSelect').value;
+        var season = document.getElementById('seasonSelectTop').value;
 
         if (t1 === t2) {
             alert("Please select two different teams.");
@@ -504,7 +532,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     
     // Auto-update on season change
-    document.getElementById('seasonSelect').addEventListener('change', function () {
+    document.getElementById('seasonSelectTop').addEventListener('change', function () {
         document.getElementById('compareBtn').click();
     });
 

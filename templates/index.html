@@ -4,48 +4,41 @@
 IPL Analytics Dashboard
 {% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <!-- HERO SECTION -->
 
-<section class="hero">
+<section class="hero-section">
+    <div class="container-xl">
+        <div class="hero-badge-blue">
+            Data • Insights • Performance
+        </div>
 
+        <h1 class="hero-title">
+            The Smartest Way to Analyze<br>
+            <span class="text-blue">IPL Teams, Players & Rivalries</span>
+        </h1>
 
-<div class="container-xl">
+        <p class="hero-subtitle">
+            Get complete analytics on IPL teams, player performances, venues,<br>
+            head-to-head matchups & season insights — all in one place.
+        </p>
 
-    <div class="badge-custom">
-        DATA • INSIGHTS • PERFORMANCE
+        <div class="hero-actions">
+            <a href="{{ url_for('teams') }}" class="btn-primary-blue">
+                <i class="fa-solid fa-users"></i> Explore Teams
+            </a>
+            <a href="{{ url_for('players') }}" class="btn-outline-blue">
+                <i class="fa-regular fa-user"></i> Analyze Players
+            </a>
+        </div>
     </div>
-
-    <h1>
-        The Smartest Way to Analyze
-        <span>IPL Teams, Players & Rivalries</span>
-    </h1>
-
-    <p>
-        Explore team performance, player statistics,
-        head-to-head battles, venue insights and
-        season trends from every IPL campaign.
-    </p>
-
-    <div class="hero-buttons">
-
-        <a href="{{ url_for('teams') }}"
-           class="btn btn-primary btn-lg">
-            Explore Teams
-        </a>
-
-        <a href="{{ url_for('players') }}"
-           class="btn btn-outline-primary btn-lg">
-            Analyze Players
-        </a>
-
-    </div>
-
-</div>
-
-
 </section>
+
 
 <!-- FEATURE CARDS -->
 
