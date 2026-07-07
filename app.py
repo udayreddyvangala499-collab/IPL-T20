@@ -992,12 +992,183 @@ def about():
 # WINNERS / CHAMPIONS
 # ==========================================
 
-@app.route("/winners")
-def winners():
+ALL_CHAMPIONS = {
+    2025: {"team": "Royal Challengers Bengaluru", "logo": "RCB.jpg"},
+    2024: {"team": "Kolkata Knight Riders",        "logo": "KKR.png"},
+    2023: {"team": "Chennai Super Kings",           "logo": "CSK.png"},
+    2022: {"team": "Gujarat Titans",                "logo": "GT.jpg"},
+    2021: {"team": "Chennai Super Kings",           "logo": "CSK.png"},
+    2020: {"team": "Mumbai Indians",                "logo": "MI.jpg"},
+    2019: {"team": "Mumbai Indians",                "logo": "MI.jpg"},
+    2018: {"team": "Chennai Super Kings",           "logo": "CSK.png"},
+    2017: {"team": "Mumbai Indians",                "logo": "MI.jpg"},
+    2016: {"team": "Sunrisers Hyderabad",           "logo": "SRH.png"},
+    2015: {"team": "Mumbai Indians",                "logo": "MI.jpg"},
+    2014: {"team": "Kolkata Knight Riders",         "logo": "KKR.png"},
+    2013: {"team": "Mumbai Indians",                "logo": "MI.jpg"},
+    2012: {"team": "Kolkata Knight Riders",         "logo": "KKR.png"},
+    2011: {"team": "Chennai Super Kings",           "logo": "CSK.png"},
+    2010: {"team": "Chennai Super Kings",           "logo": "CSK.png"},
+    2009: {"team": "Deccan Chargers",               "logo": "Deccan.jpg"},
+    2008: {"team": "Rajasthan Royals",              "logo": "RR.jpg"},
+}
+
+@app.route("/champions")
+@app.route("/champions/<int:year>")
+def champions(year=None):
+    if year is None:
+        year = max(ALL_CHAMPIONS.keys())
+
+    champ_info = ALL_CHAMPIONS.get(year)
+    if not champ_info:
+        year = max(ALL_CHAMPIONS.keys())
+        champ_info = ALL_CHAMPIONS[year]
+
+    team = champ_info["team"]
+    logo = champ_info["logo"]
+
+    # ---- filter season data ----
+    season_df = df[df["season"] == year]
+
+    match_summary = season_df[
+        ["match_id", "batting_team", "bowling_team", "match_won_by", "win_outcome", "venue"]
+    ].drop_duplicates(subset=["match_id"])
+
+    team_matches = match_summary[
+        (match_summary["batting_team"] == team) |
+        (match_summary["bowling_team"] == team)
+    ]
+
+    total_matches = team_matches.shape[0]
+    wins = team_matches[team_matches["match_won_by"] == team].shape[0]
+    losses = total_matches - wins
+    win_pct = round((wins / total_matches) * 100, 1) if total_matches else 0
+
+    # ---- batting stats (champion team) ----
+    bat_df = season_df[season_df["batting_team"] == team]
+
+    total_runs = int(bat_df["batter_runs"].sum()) if "batter_runs" in bat_df.columns else 0
+    total_balls = int(bat_df["batter_balls"].sum()) if "batter_balls" in bat_df.columns else 0
+    team_sr = round((total_runs / total_balls) * 100, 2) if total_balls else 0
+
+    innings_totals = bat_df.groupby(["match_id", "innings"])["runs_total"].sum()
+    highest_total = int(innings_totals.max()) if not innings_totals.empty else 0
+    lowest_total  = int(innings_totals[innings_totals > 0].min()) if not innings_totals.empty else 0
+
+    top_batsman = (
+        bat_df.groupby("batter")["batter_runs"].sum().idxmax()
+        if not bat_df.empty else "-"
+    )
+    top_batsman_runs = (
+        int(bat_df.groupby("batter")["batter_runs"].sum().max())
+        if not bat_df.empty else 0
+    )
+
+    sixes = int((bat_df["batter_runs"] == 6).sum()) if not bat_df.empty else 0
+    fours = int((bat_df["batter_runs"] == 4).sum()) if not bat_df.empty else 0
+
+    # ---- bowling stats (champion team) ----
+    bowl_df = season_df[season_df["bowling_team"] == team]
+
+    wickets = int(bowl_df["bowler_wicket"].sum()) if "bowler_wicket" in bowl_df.columns else 0
+    balls_bowled = int(bowl_df["valid_ball"].sum()) if "valid_ball" in bowl_df.columns else 0
+    overs = balls_bowled / 6 if balls_bowled else 0
+    runs_given = int(bowl_df["runs_total"].sum()) if not bowl_df.empty else 0
+
+    bowling_avg = round(runs_given / wickets, 2) if wickets else 0
+    economy = round(runs_given / overs, 2) if overs else 0
+    bowling_sr = round(balls_bowled / wickets, 2) if wickets else 0
+
+    top_bowler = (
+        bowl_df.groupby("bowler")["bowler_wicket"].sum().idxmax()
+        if not bowl_df.empty else "-"
+    )
+    top_bowler_wickets = (
+        int(bowl_df.groupby("bowler")["bowler_wicket"].sum().max())
+        if not bowl_df.empty else 0
+    )
+
+    dot_pct = round(
+        (len(bowl_df[bowl_df["runs_total"] == 0]) / len(bowl_df)) * 100, 2
+    ) if len(bowl_df) else 0
+
+    # ---- top players across all teams in that season ----
+    all_bat = season_df.groupby("batter")["batter_runs"].sum().nlargest(5).reset_index()
+    top_run_scorers = [
+        {"name": row["batter"], "runs": int(row["batter_runs"])}
+        for _, row in all_bat.iterrows()
+    ]
+
+    all_bowl = season_df.groupby("bowler")["bowler_wicket"].sum().nlargest(5).reset_index()
+    top_wicket_takers = [
+        {"name": row["bowler"], "wickets": int(row["bowler_wicket"])}
+        for _, row in all_bowl.iterrows()
+    ]
+
+    # ---- finalist info (runner-up) ----
+    finals_matches = match_summary.sort_values("match_id", ascending=False)
+    runner_up = "-"
+    if not finals_matches.empty:
+        last = finals_matches.iloc[0]
+        runner_up = (
+            last["bowling_team"]
+            if last["batting_team"] == team
+            else last["batting_team"]
+        )
+
+    champion = {
+        "year":   year,
+        "team":   team,
+        "logo":   logo,
+        "short":  SHORT_NAMES.get(team, team[:3].upper()),
+        "runner_up": runner_up,
+        "matches":   total_matches,
+        "wins":      wins,
+        "losses":    losses,
+        "win_pct":   win_pct,
+    }
+
+    batting = {
+        "total_runs":     total_runs,
+        "strike_rate":    team_sr,
+        "highest_total":  highest_total,
+        "lowest_total":   lowest_total,
+        "top_batsman":    top_batsman,
+        "top_batsman_runs": top_batsman_runs,
+        "sixes":          sixes,
+        "fours":          fours,
+    }
+
+    bowling = {
+        "wickets":     wickets,
+        "average":     bowling_avg,
+        "economy":     economy,
+        "strike_rate": bowling_sr,
+        "top_bowler":  top_bowler,
+        "top_bowler_wickets": top_bowler_wickets,
+        "dot_pct":     dot_pct,
+    }
+
+    all_years = sorted(ALL_CHAMPIONS.keys(), reverse=True)
+    all_seasons = [
+        {
+            "year": y,
+            "team": ALL_CHAMPIONS[y]["team"],
+            "logo": ALL_CHAMPIONS[y]["logo"],
+            "short": SHORT_NAMES.get(ALL_CHAMPIONS[y]["team"], ALL_CHAMPIONS[y]["team"][:3].upper()),
+        }
+        for y in all_years
+    ]
 
     return render_template(
-        "winners.html",
-        champions=ALL_CHAMPIONS
+        "champions.html",
+        champion=champion,
+        batting=batting,
+        bowling=bowling,
+        top_run_scorers=top_run_scorers,
+        top_wicket_takers=top_wicket_takers,
+        all_years=all_years,
+        all_seasons=all_seasons,
     )
 
 # ==========================================
