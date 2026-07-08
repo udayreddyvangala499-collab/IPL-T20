@@ -248,9 +248,16 @@ def get_h2h_stats(team1, team2, season="All IPL Seasons"):
         insights.append(f"Average first innings score in H2H matches is {int(innings1_avg)} runs.")
         
     # Insight 4: Toss impact
-    toss_impact = h2h[h2h["toss_winner"] == h2h["match_won_by"]]["match_id"].nunique()
+       # Insight 4: Toss impact
+    toss_impact = h2h[
+        h2h["toss_winner"].astype(str) ==
+        h2h["match_won_by"].astype(str)
+    ]["match_id"].nunique()
+
     if total_matches > 0:
-        insights.append(f"Toss has an impact in {int((toss_impact/total_matches)*100)}% of H2H matches.")
+        insights.append(
+            f"Toss has an impact in {int((toss_impact / total_matches) * 100)}% of H2H matches."
+        )
 
     return {
         "matches": total_matches,
@@ -259,7 +266,7 @@ def get_h2h_stats(team1, team2, season="All IPL Seasons"):
         "no_result": no_result,
         "ties": ties,
         "team1_win_pct": round(wins1 * 100 / total_matches, 2) if total_matches else 0,
-        "team2_win_pct": round(wins2 * 100 / total_matches, 2) if total_matches else 0,
+        "team2_win_pct": round(team2_wins * 100 / total_matches, 2) if total_matches else 0,
         "innings1_avg": round(innings1_avg, 2) if pd.notna(innings1_avg) else 0,
         "innings2_avg": round(innings2_avg, 2) if pd.notna(innings2_avg) else 0,
         "highest_total_t1": highest_total_t1,
