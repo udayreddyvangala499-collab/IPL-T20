@@ -1,5 +1,4 @@
 import os
-from unicodedata import category
 import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,6 +18,8 @@ USE_COLS = [
     "bowling_team",
     "match_won_by",
     "win_outcome",
+    "result_type",
+    "toss_winner",
 
     "batter",
     "bowler",
@@ -44,6 +45,8 @@ DTYPES = {
     "batting_team": "category",
     "bowling_team": "category",
     "match_won_by": "category",
+    "toss_winner": "category",
+    "result_type": "category",
 
     "venue": "category",
     "stage": "category",
@@ -54,10 +57,6 @@ DTYPES = {
     "fielders": "string",
     "player_out": "category",
     "player_of_match": "category",
-    
-    "result_type": "category",
-    "toss_winner": "category",
-
     "wicket_kind": "category",
 
     "runs_total": "int16",
@@ -68,17 +67,26 @@ DTYPES = {
     "valid_ball": "int8",
     "bowler_wicket": "int8"
 }
-
-
 def get_df():
     global _df
 
     if _df is None:
         _df = pd.read_csv(
-						CSV_PATH,
-						usecols=USE_COLS,
-						dtype=DTYPES,
-						parse_dates=["date"],
-						dayfirst=True
-				)
+            CSV_PATH,
+            usecols=USE_COLS,
+            dtype=DTYPES,
+            parse_dates=["date"],
+            dayfirst=True,
+            low_memory=False
+        )
+
+        print(_df.columns.tolist())
+        print("result_type" in _df.columns)
+        print("toss_winner" in _df.columns)
+
+        print(
+            f"DataFrame Memory: "
+            f"{_df.memory_usage(deep=True).sum() / 1024 / 1024:.2f} MB"
+        )
+
     return _df
