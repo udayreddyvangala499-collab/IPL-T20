@@ -121,10 +121,10 @@ PURPLE_CAPS = {}
 
 if not df.empty and 'season' in df.columns:
     try:
-        season_runs = df.groupby(['season', 'batter', 'batting_team'])['batter_runs'].sum().reset_index()
-        top_batters = season_runs.loc[season_runs.groupby('season')['batter_runs'].idxmax()]
+        season_runs = df.groupby(['season', 'batter', 'batting_team'])['runs_batter'].sum().reset_index()
+        top_batters = season_runs.loc[season_runs.groupby('season')['runs_batter'].idxmax()]
         for _, row in top_batters.iterrows():
-            ORANGE_CAPS[row['season']] = {"player": row['batter'], "team": row['batting_team'], "runs": int(row['batter_runs'])}
+            ORANGE_CAPS[row['season']] = {"player": row['batter'], "team": row['batting_team'], "runs": int(row['runs_batter'])}
             
         season_wickets = df.groupby(['season', 'bowler', 'bowling_team'])['bowler_wicket'].sum().reset_index()
         top_bowlers = season_wickets.loc[season_wickets.groupby('season')['bowler_wicket'].idxmax()]
@@ -268,7 +268,7 @@ def team_details(team):
     }
 
     total_runs = int(
-        batting_df["batter_runs"].sum()
+        batting_df["runs_batter"].sum()
     )
 
     total_balls = int(
@@ -299,7 +299,7 @@ def team_details(team):
 
     boundary_percentage = round(
         (
-            batting_df["batter_runs"]
+            batting_df["runs_batter"]
             .isin([4, 6])
             .sum()
             / len(batting_df)
@@ -308,7 +308,7 @@ def team_details(team):
     ) if len(batting_df) else 0
 
     most_runs_scorer = (
-        batting_df.groupby("batter")["batter_runs"]
+        batting_df.groupby("batter")["runs_batter"]
         .sum()
         .idxmax()
         if not batting_df.empty else "-"
@@ -316,7 +316,7 @@ def team_details(team):
 
     player_scores = batting_df.groupby(
         ["match_id", "batter"]
-    )["batter_runs"].sum()
+    )["runs_batter"].sum()
 
     centuries = int(
         (player_scores >= 100).sum()
@@ -435,19 +435,19 @@ def team_details(team):
     # ==========================================
     
     # 1. Champions
-    champions = [c["year"] for c in ALL_CHAMPIONS if c["team"] == team]
+    champions = [year for year, info in ALL_CHAMPIONS.items() if info.get("team") == team]
     
     # 2. Top 5 Scorers (Orange Cap style)
     try:
         top_scorers = (
-            batting_df.groupby("batter")["batter_runs"]
+            batting_df.groupby("batter")["runs_batter"]
             .sum()
             .sort_values(ascending=False)
             .head(5)
             .reset_index()
         )
         top_5_scorers = [
-            {"name": row["batter"], "runs": int(row["batter_runs"])}
+            {"name": row["batter"], "runs": int(row["runs_batter"])}
             for _, row in top_scorers.iterrows()
         ]
     except:
@@ -1027,48 +1027,85 @@ def champions(year=None):
     team = champ_info["team"]
     logo = champ_info["logo"]
 
+    # Use query_team for dataset filtering, because old teams like Deccan Chargers were replaced
+    query_team = TEAM_MAPPING.get(team, team)
+
     # ---- filter season data ----
-    season_df = df[df["season"] == year]
+    SEASON_MAPPING = {
+        2008: "2007/08",
+        2010: "2009/10",
+        2020: "2020/21"
+    }
+    season_str = SEASON_MAPPING.get(year, str(year))
+    season_df = df[df["season"] == season_str]
 
     match_summary = season_df[
-        ["match_id", "batting_team", "bowling_team", "match_won_by", "win_outcome", "venue"]
+        ["match_id", "batting_team", "bowling_team", "match_won_by",
+         "win_outcome", "venue", "stage", "player_of_match"]
     ].drop_duplicates(subset=["match_id"])
 
     team_matches = match_summary[
-        (match_summary["batting_team"] == team) |
-        (match_summary["bowling_team"] == team)
+        (match_summary["batting_team"] == query_team) |
+        (match_summary["bowling_team"] == query_team)
     ]
 
     total_matches = team_matches.shape[0]
-    wins = team_matches[team_matches["match_won_by"] == team].shape[0]
+    wins = team_matches[team_matches["match_won_by"] == query_team].shape[0]
     losses = total_matches - wins
     win_pct = round((wins / total_matches) * 100, 1) if total_matches else 0
 
+    # ---- Final match details ----
+    final_match = match_summary[match_summary["stage"] == "Final"]
+    runner_up = "-"
+    final_venue = "-"
+    final_margin = "-"
+    final_mom = "-"
+
+    if not final_match.empty:
+        final_row = final_match.iloc[0]
+        # Runner-up is the team that lost
+        if final_row["match_won_by"] == final_row["batting_team"]:
+            runner_up = final_row["bowling_team"]
+        else:
+            runner_up = final_row["batting_team"]
+            
+        # Reverse mapping for display if runner-up was mapped
+        REVERSE_TEAM_MAP = {v: k for k, v in TEAM_MAPPING.items()}
+        # For 2009 final, runner_up should be RCB. RCB is replaced with Royal Challengers Bengaluru.
+        # Actually it's better to just leave it as is or map back if needed.
+        if runner_up in REVERSE_TEAM_MAP and year <= 2020: 
+            # We can skip reverse mapping and just show the modern name, or keep it simple.
+            pass
+            
+        final_venue = final_row.get("venue", "-")
+        final_margin = final_row.get("win_outcome", "-")
+        final_mom = final_row.get("player_of_match", "-")
+
     # ---- batting stats (champion team) ----
-    bat_df = season_df[season_df["batting_team"] == team]
+    bat_df = season_df[season_df["batting_team"] == query_team]
 
-    total_runs = int(bat_df["batter_runs"].sum()) if "batter_runs" in bat_df.columns else 0
-    total_balls = int(bat_df["batter_balls"].sum()) if "batter_balls" in bat_df.columns else 0
-    team_sr = round((total_runs / total_balls) * 100, 2) if total_balls else 0
-
+    total_runs = int(bat_df["runs_batter"].sum()) if "runs_batter" in bat_df.columns else 0
+    total_balls = int(bat_df["valid_ball"].sum()) if "valid_ball" in bat_df.columns else len(bat_df)
+    overs = total_balls / 6 if total_balls else 0
+    team_rr = round(total_runs / overs, 2) if overs else 0
     innings_totals = bat_df.groupby(["match_id", "innings"])["runs_total"].sum()
     highest_total = int(innings_totals.max()) if not innings_totals.empty else 0
     lowest_total  = int(innings_totals[innings_totals > 0].min()) if not innings_totals.empty else 0
 
     top_batsman = (
-        bat_df.groupby("batter")["batter_runs"].sum().idxmax()
+        bat_df.groupby("batter")["runs_batter"].sum().idxmax()
         if not bat_df.empty else "-"
     )
     top_batsman_runs = (
-        int(bat_df.groupby("batter")["batter_runs"].sum().max())
+        int(bat_df.groupby("batter")["runs_batter"].sum().max())
         if not bat_df.empty else 0
     )
 
-    sixes = int((bat_df["batter_runs"] == 6).sum()) if not bat_df.empty else 0
-    fours = int((bat_df["batter_runs"] == 4).sum()) if not bat_df.empty else 0
+    sixes = int((bat_df["runs_batter"] == 6).sum()) if not bat_df.empty else 0
+    fours = int((bat_df["runs_batter"] == 4).sum()) if not bat_df.empty else 0
 
     # ---- bowling stats (champion team) ----
-    bowl_df = season_df[season_df["bowling_team"] == team]
+    bowl_df = season_df[season_df["bowling_team"] == query_team]
 
     wickets = int(bowl_df["bowler_wicket"].sum()) if "bowler_wicket" in bowl_df.columns else 0
     balls_bowled = int(bowl_df["valid_ball"].sum()) if "valid_ball" in bowl_df.columns else 0
@@ -1093,9 +1130,9 @@ def champions(year=None):
     ) if len(bowl_df) else 0
 
     # ---- top players across all teams in that season ----
-    all_bat = season_df.groupby("batter")["batter_runs"].sum().nlargest(5).reset_index()
+    all_bat = season_df.groupby("batter")["runs_batter"].sum().nlargest(5).reset_index()
     top_run_scorers = [
-        {"name": row["batter"], "runs": int(row["batter_runs"])}
+        {"name": row["batter"], "runs": int(row["runs_batter"])}
         for _, row in all_bat.iterrows()
     ]
 
@@ -1105,32 +1142,39 @@ def champions(year=None):
         for _, row in all_bowl.iterrows()
     ]
 
-    # ---- finalist info (runner-up) ----
-    finals_matches = match_summary.sort_values("match_id", ascending=False)
-    runner_up = "-"
-    if not finals_matches.empty:
-        last = finals_matches.iloc[0]
-        runner_up = (
-            last["bowling_team"]
-            if last["batting_team"] == team
-            else last["batting_team"]
-        )
+    # ---- Orange Cap & Purple Cap holders ----
+    orange_cap = top_run_scorers[0] if top_run_scorers else {"name": "-", "runs": 0}
+    purple_cap = top_wicket_takers[0] if top_wicket_takers else {"name": "-", "wickets": 0}
+
+    # ---- Total season sixes/fours (all teams) ----
+    season_sixes = int((season_df["runs_batter"] == 6).sum()) if not season_df.empty else 0
+    season_fours = int((season_df["runs_batter"] == 4).sum()) if not season_df.empty else 0
+    season_total_runs = int(season_df["runs_batter"].sum()) if not season_df.empty else 0
+    season_total_matches = season_df["match_id"].nunique() if not season_df.empty else 0
+
+    # ---- Title counts (how many titles this team has won) ----
+    title_count = sum(1 for info in ALL_CHAMPIONS.values() if info["team"] == team)
 
     champion = {
-        "year":   year,
-        "team":   team,
-        "logo":   logo,
-        "short":  SHORT_NAMES.get(team, team[:3].upper()),
-        "runner_up": runner_up,
-        "matches":   total_matches,
-        "wins":      wins,
-        "losses":    losses,
-        "win_pct":   win_pct,
+        "year":       year,
+        "team":       team,
+        "logo":       logo,
+        "short":      SHORT_NAMES.get(team, team[:3].upper()),
+        "runner_up":  runner_up,
+        "runner_up_logo": LOGO_MAP.get(runner_up, "IPL1.jpg"),
+        "matches":    total_matches,
+        "wins":       wins,
+        "losses":     losses,
+        "win_pct":    win_pct,
+        "final_venue":  final_venue,
+        "final_margin": final_margin,
+        "final_mom":    final_mom,
+        "title_count":  title_count,
     }
 
     batting = {
         "total_runs":     total_runs,
-        "strike_rate":    team_sr,
+        "run_rate":       team_rr,
         "highest_total":  highest_total,
         "lowest_total":   lowest_total,
         "top_batsman":    top_batsman,
@@ -1160,6 +1204,15 @@ def champions(year=None):
         for y in all_years
     ]
 
+    season_overview = {
+        "total_matches":  season_total_matches,
+        "total_runs":     season_total_runs,
+        "total_sixes":    season_sixes,
+        "total_fours":    season_fours,
+        "orange_cap":     orange_cap,
+        "purple_cap":     purple_cap,
+    }
+
     return render_template(
         "champions.html",
         champion=champion,
@@ -1169,6 +1222,8 @@ def champions(year=None):
         top_wicket_takers=top_wicket_takers,
         all_years=all_years,
         all_seasons=all_seasons,
+        season_overview=season_overview,
+        active_page="champions",
     )
 
 # ==========================================
