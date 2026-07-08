@@ -220,43 +220,63 @@ def get_h2h_stats(team1, team2, season="All IPL Seasons"):
     bowling["econ"] = bowling.apply(lambda x: round((x["runs_given"] / x["balls_bowled"]) * 6, 2) if x["balls_bowled"] > 0 else 0, axis=1)
     top_bowlers = bowling.sort_values("wickets", ascending=False).head(5).to_dict("records")
     
-    # AI Match Insights
+   # ------------------------
+# AI Match Insights
+# ------------------------
+
     insights = []
-    
+
     # Insight 1: Recent dominance
     if not recent_matches.empty:
         last_10 = recent_matches.head(10)
+
         t1_recent = last_10[last_10["match_won_by"] == team1].shape[0]
         t2_recent = last_10[last_10["match_won_by"] == team2].shape[0]
+
         if t1_recent > t2_recent:
-            insights.append(f"{team1} has won {t1_recent} of the last {len(last_10)} H2H matches.")
+            insights.append(
+                f"{team1} has won {t1_recent} of the last {len(last_10)} H2H matches."
+            )
         elif t2_recent > t1_recent:
-            insights.append(f"{team2} has won {t2_recent} of the last {len(last_10)} H2H matches.")
+            insights.append(
+                f"{team2} has won {t2_recent} of the last {len(last_10)} H2H matches."
+            )
         else:
-            insights.append(f"The last {len(last_10)} matches have been evenly split.")
-            
+            insights.append(
+                f"The last {len(last_10)} matches have been evenly split."
+            )
+
     # Insight 2: Venue dominance
-    if len(venue_stats_dict) > 0:
+    if venue_stats_dict:
         top_venue = venue_stats_dict[0]
+
         if top_venue["wins1"] > top_venue["wins2"]:
-            insights.append(f"{team1} dominates at {top_venue['venue']}, winning {int((top_venue['wins1']/top_venue['total'])*100)}% of matches.")
+            insights.append(
+                f"{team1} dominates at {top_venue['venue']}, "
+                f"winning {int((top_venue['wins1'] / top_venue['total']) * 100)}% of matches."
+            )
         elif top_venue["wins2"] > top_venue["wins1"]:
-            insights.append(f"{team2} dominates at {top_venue['venue']}, winning {int((top_venue['wins2']/top_venue['total'])*100)}% of matches.")
-            
-    # Insight 3: Average 1st innings score
+            insights.append(
+                f"{team2} dominates at {top_venue['venue']}, "
+                f"winning {int((top_venue['wins2'] / top_venue['total']) * 100)}% of matches."
+            )
+
+    # Insight 3: Average First Innings Score
     if pd.notna(innings1_avg):
-        insights.append(f"Average first innings score in H2H matches is {int(innings1_avg)} runs.")
-        
-    # Insight 4: Toss impact
-       # Insight 4: Toss impact
+        insights.append(
+            f"Average first innings score in H2H matches is {int(innings1_avg)} runs."
+        )
+
+    # Insight 4: Toss Impact
     toss_impact = h2h[
-        h2h["toss_winner"].astype(str) ==
-        h2h["match_won_by"].astype(str)
+        h2h["toss_winner"].astype(str)
+        == h2h["match_won_by"].astype(str)
     ]["match_id"].nunique()
 
     if total_matches > 0:
         insights.append(
-            f"Toss has an impact in {int((toss_impact / total_matches) * 100)}% of H2H matches."
+            f"Toss winner also won the match in "
+            f"{round((toss_impact / total_matches) * 100)}% of H2H matches."
         )
 
     return {
@@ -266,7 +286,7 @@ def get_h2h_stats(team1, team2, season="All IPL Seasons"):
         "no_result": no_result,
         "ties": ties,
         "team1_win_pct": round(wins1 * 100 / total_matches, 2) if total_matches else 0,
-        "team2_win_pct": round(team2_wins * 100 / total_matches, 2) if total_matches else 0,
+        "team2_win_pct": round(wins2 * 100 / total_matches, 2) if total_matches else 0,
         "innings1_avg": round(innings1_avg, 2) if pd.notna(innings1_avg) else 0,
         "innings2_avg": round(innings2_avg, 2) if pd.notna(innings2_avg) else 0,
         "highest_total_t1": highest_total_t1,
@@ -279,5 +299,8 @@ def get_h2h_stats(team1, team2, season="All IPL Seasons"):
         "top_batsmen": top_batsmen,
         "top_bowlers": top_bowlers,
         "insights": insights,
-        "seasons": sorted(h2h["season"].dropna().unique().tolist(), reverse=True)
+        "seasons": sorted(
+            h2h["season"].dropna().unique().tolist(),
+            reverse=True
+        )
     }
