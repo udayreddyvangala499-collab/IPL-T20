@@ -1,8 +1,8 @@
 import pandas as pd
 
-df = pd.read_csv("data/IPL.csv")
-print("Unique Seasons:")
-print(df['season'].astype(str).unique())
+from utils.data_loader import get_df
+
+df = get_df()
 
 def get_home_stats():
 

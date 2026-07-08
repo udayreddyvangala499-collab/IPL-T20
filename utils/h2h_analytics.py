@@ -4,7 +4,9 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV_PATH = os.path.join(BASE_DIR, "data", "IPL.csv")
 
-df = pd.read_csv(CSV_PATH, low_memory=False)
+from utils.data_loader import get_df
+
+df = get_df()
 
 TEAM_MAPPING = {
     "Deccan Chargers": "Sunrisers Hyderabad",
