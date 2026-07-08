@@ -1,4 +1,5 @@
 import os
+from unicodedata import category
 import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -53,6 +54,9 @@ DTYPES = {
     "fielders": "string",
     "player_out": "category",
     "player_of_match": "category",
+    
+    "result_type": "category",
+    "toss_winner": "category",
 
     "wicket_kind": "category",
 
