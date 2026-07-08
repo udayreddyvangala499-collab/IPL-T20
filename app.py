@@ -7,7 +7,6 @@ from flask import (
 )
 
 from utils.h2h_analytics import get_teams, get_h2h_stats
-import pandas as pd
 
 import pandas as pd
 app = Flask(__name__)
@@ -16,30 +15,27 @@ app = Flask(__name__)
 # LOAD DATASET
 # ==========================================
 
+from utils.data_loader import get_df
 try:
-    df = pd.read_csv(
-        "data/IPL.csv",
-        low_memory=False
-    )
+    df = get_df()
+    print(df.memory_usage(deep=True).sum() / 1024 / 1024)
 
     print("IPL Dataset Loaded Successfully")
+
     TEAM_MAPPING = {
-    "Deccan Chargers": "Sunrisers Hyderabad",
-    "Delhi Daredevils": "Delhi Capitals",
-    "Kings XI Punjab": "Punjab Kings",
-    "Royal Challengers Bangalore": "Royal Challengers Bengaluru"
-}
+        "Deccan Chargers": "Sunrisers Hyderabad",
+        "Delhi Daredevils": "Delhi Capitals",
+        "Kings XI Punjab": "Punjab Kings",
+        "Royal Challengers Bangalore": "Royal Challengers Bengaluru"
+    }
 
     if not df.empty:
-      df["batting_team"] = df["batting_team"].replace(TEAM_MAPPING)
-      df["bowling_team"] = df["bowling_team"].replace(TEAM_MAPPING)
-
+        df["batting_team"] = df["batting_team"].replace(TEAM_MAPPING)
+        df["bowling_team"] = df["bowling_team"].replace(TEAM_MAPPING)
 
 except Exception as e:
-
     print("Dataset Error:", e)
     df = pd.DataFrame()
-
 # ==========================================
 # TEAM LOGOS
 # ==========================================
