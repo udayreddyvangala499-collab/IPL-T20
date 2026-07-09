@@ -147,4 +147,37 @@ tbody tr:hover {
     .player-search-wrapper {
         width: 100%;
     }
+
+    .player-search-form {
+        width: 100%;
+    }
+
+    .season-card {
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .season-card h3 {
+        font-size: 1rem;
+    }
+
+    th, td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .player-breadcrumb {
+        font-size: 13px;
+    }
+
+    .season-card {
+        padding: 10px;
+    }
+
+    th, td {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
 }

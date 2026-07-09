@@ -163,14 +163,81 @@
     }
 }
 
+@media(max-width: 1100px) {
+    .teams-sidebar {
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .teams-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media(max-width: 768px) {
+    .teams-section {
+        padding: 20px 0;
+    }
+
     .bottom-section, .middle-section {
         grid-template-columns: 1fr;
     }
+
     .caps-row {
         grid-template-columns: 1fr;
     }
+
     .teams-content .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .teams-sidebar {
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .teams-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .highlight-card {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .highlight-card h3 {
+        font-size: 15px;
+    }
+
+    .champions-row-card {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .champions-row-card h3 {
+        font-size: 15px;
+    }
+
+    .champion-badge {
+        padding: 6px 14px;
+        font-size: 13px;
+    }
+
+    .card-body-scroll {
+        max-height: 200px;
+    }
+}
+
+@media(max-width: 576px) {
+    .teams-content .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .teams-grid {
+        grid-template-columns: 1fr;
     }
 }

@@ -786,4 +786,240 @@
         flex: 1 1 50%;
         border-bottom: 1px dashed #e2e8f0;
     }
+
+    .h2h-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .col-span-2 { grid-column: span 3; }
+    .col-span-3 { grid-column: span 3; }
+    .col-span-4 { grid-column: span 6; }
+    .col-span-6 { grid-column: span 6; }
 }
+
+@media (max-width: 768px) {
+    .h2h-dashboard {
+        padding: 16px 8px 40px;
+    }
+
+    /* Top Header */
+    .h2h-top-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .h2h-top-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .h2h-top-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .h2h-select-format {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .h2h-btn-export {
+        flex-shrink: 0;
+    }
+
+    /* Banners */
+    .h2h-banners {
+        flex-direction: column;
+        height: auto;
+        border-radius: 12px;
+    }
+
+    .h2h-team-banner {
+        padding: 20px 16px;
+        justify-content: center;
+    }
+
+    .h2h-team2-banner {
+        justify-content: center;
+    }
+
+    .h2h-team2-banner .h2h-banner-content {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .h2h-vs-section {
+        transform: none;
+        width: 100%;
+        margin: 0;
+        padding: 8px 0;
+        justify-content: center;
+    }
+
+    .h2h-vs-circle {
+        transform: none;
+        font-size: 1.4rem;
+    }
+
+    .h2h-vs-line-left, .h2h-vs-line-right {
+        display: none;
+    }
+
+    .h2h-banner-logo img {
+        width: 56px;
+        height: 56px;
+    }
+
+    .h2h-banner-text h3 {
+        font-size: 1.1rem;
+    }
+
+    /* Selectors */
+    .h2h-selectors-row-card {
+        flex-direction: column;
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .h2h-select-group {
+        width: 100%;
+    }
+
+    .h2h-select-group select {
+        max-width: 100%;
+    }
+
+    .h2h-swap-icon {
+        margin: 0;
+    }
+
+    .h2h-compare-btn-new {
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Grid */
+    .h2h-grid {
+        grid-template-columns: 1fr;
+    }
+    .col-span-2, .col-span-3, .col-span-4, .col-span-6 {
+        grid-column: span 1;
+    }
+
+    /* KPI */
+    .h2h-kpi-unified-card {
+        flex-direction: column;
+        padding: 0;
+    }
+    .h2h-kpi-item {
+        flex: 1 1 100%;
+        padding: 16px;
+    }
+
+    .kpi-val {
+        font-size: 1.6rem;
+    }
+
+    /* Donut */
+    .donut-layout {
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .chart-container {
+        width: 110px;
+        height: 110px;
+    }
+
+    /* Score */
+    .h2h-score-split {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .score-val {
+        font-size: 1.3rem;
+    }
+
+    /* Insights */
+    .h2h-insights-card {
+        flex-direction: column;
+    }
+
+    .insight-brand {
+        flex-direction: row;
+        border-right: none;
+        border-bottom: 1px dashed #e2e8f0;
+        min-width: unset;
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .insight-items {
+        flex-direction: column;
+    }
+
+    .insight-item {
+        flex: 1 1 100%;
+        padding: 14px 16px;
+        border-right: none;
+    }
+
+    /* Venue bars */
+    .venue-bar-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .venue-name {
+        width: 100%;
+    }
+
+    /* Tables */
+    .h2h-table thead th,
+    .h2h-table tbody td {
+        padding: 8px 6px;
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .h2h-top-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .h2h-banner-text h3 {
+        font-size: 0.95rem;
+    }
+
+    .h2h-banner-logo img {
+        width: 44px;
+        height: 44px;
+    }
+
+    .h2h-card {
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .h2h-card-title {
+        font-size: 0.65rem;
+    }
+
+    .kpi-val {
+        font-size: 1.3rem;
+    }
+
+    .total-score {
+        font-size: 1.1rem;
+    }
+
+    .h2h-toggle button {
+        font-size: 0.6rem;
+        padding: 5px 12px;
+    }
+}
+

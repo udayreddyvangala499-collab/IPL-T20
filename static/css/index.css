@@ -102,20 +102,34 @@ HERO SECTION
 
 @media(max-width: 768px) {
     .hero-title {
-        font-size: 48px;
+        font-size: 36px;
         letter-spacing: -1px;
     }
     .hero-subtitle {
-        font-size: 18px;
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 16px auto 24px;
     }
     .hero-section {
-        padding: 80px 20px 60px;
+        padding: 60px 16px 50px;
+    }
+    .hero-badge-blue {
+        font-size: 12px;
+        padding: 5px 14px;
+        margin-bottom: 16px;
     }
 }
 
 @media(max-width: 576px) {
     .hero-title {
-        font-size: 38px;
+        font-size: 28px;
+        letter-spacing: -0.5px;
+    }
+    .hero-subtitle {
+        font-size: 15px;
+    }
+    .hero-section {
+        padding: 50px 12px 40px;
     }
     .hero-actions {
         flex-direction: column;
@@ -123,5 +137,7 @@ HERO SECTION
     .btn-primary-blue, .btn-outline-blue {
         width: 100%;
         justify-content: center;
+        padding: 12px 24px;
+        font-size: 15px;
     }
 }
