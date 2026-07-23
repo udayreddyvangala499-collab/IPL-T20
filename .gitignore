@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+.vscode/
+.agents/
+
+
+static/images/Deccan.jpg
+static/images/GL.jpg
+static/images/pune.jpg
+static/images/RSP.jpg

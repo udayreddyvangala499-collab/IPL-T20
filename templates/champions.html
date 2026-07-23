@@ -1,0 +1,936 @@
+{% extends "base.html" %}
+
+{% block title %}
+IPL Champions – {{ champion.year }}
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* ========================================
+   CHAMPIONS PAGE – Custom Styles
+   Primary accent #000080 (navy blue)
+   Surface white  #ffffff
+   Text dark      #0f172a
+   Muted text     #64748b
+   Border light   #e5e7eb
+   Background     #f8fafc
+======================================== */
+
+    .champ-hero {
+        background: linear-gradient(135deg, #050d24 0%, #000080 60%, #060e26 100%);
+        border-radius: 24px;
+        position: relative;
+        overflow: hidden;
+        color: #fff;
+        padding: 48px 40px;
+    }
+
+    .champ-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255, 255, 255, .07) 1px, transparent 0);
+        background-size: 22px 22px;
+    }
+
+    .hero-glow {
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255, 255, 255, .08) 0%, transparent 70%);
+        top: -150px;
+        right: -100px;
+        pointer-events: none;
+    }
+
+    .champ-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, .12);
+        border: 1px solid rgba(255, 255, 255, .2);
+        border-radius: 999px;
+        padding: 8px 18px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: .5px;
+        margin-bottom: 22px;
+        backdrop-filter: blur(4px);
+    }
+
+    .year-pill {
+        background: #facc15;
+        color: #111827;
+        border-radius: 999px;
+        padding: 4px 14px;
+        font-weight: 800;
+        font-size: 14px;
+    }
+
+    .team-logo-wrap {
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, .95);
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, .25);
+        flex-shrink: 0;
+    }
+
+    .team-logo-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .hero-record-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, .12);
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 12px;
+        padding: 12px 20px;
+        min-width: 100px;
+        text-align: center;
+        flex-direction: column;
+    }
+
+    /* --- Year Selector --- */
+    .year-selector-wrap {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 18px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+    }
+
+    .year-btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #334155;
+        border: 1px solid #e5e7eb;
+        background: #f8fafc;
+        transition: all .25s ease;
+        text-decoration: none;
+    }
+
+    .year-btn:hover {
+        background: #eff6ff;
+        border-color: #000080;
+        color: #000080;
+        transform: translateX(3px);
+    }
+
+    .year-btn.active-year {
+        background: #000080;
+        border-color: #000080;
+        color: #fff;
+    }
+
+    .year-btn.active-year:hover {
+        background: #000070;
+        color: #fff;
+        transform: none;
+    }
+
+    .year-logo {
+        width: 26px;
+        height: 26px;
+        object-fit: contain;
+        border-radius: 4px;
+        background: #fff;
+    }
+
+    /* --- Stat Cards --- */
+    .stat-block {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 24px 20px;
+        text-align: center;
+        transition: all .3s ease;
+        height: 100%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .03);
+    }
+
+    .stat-block:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 24px rgba(0, 0, 128, .08);
+        border-color: #2563eb;
+    }
+
+    .stat-icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        margin: 0 auto 14px;
+        transition: transform .3s ease;
+    }
+
+    .stat-block:hover .stat-icon-box {
+        transform: scale(1.12) rotate(6deg);
+    }
+
+    /* --- Section Cards --- */
+    .section-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 22px;
+        padding: 28px 28px 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .03);
+    }
+
+    .section-card h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    /* --- Top-player rows --- */
+    .player-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 14px;
+    }
+
+    .player-row:last-child {
+        border-bottom: none;
+    }
+
+    .player-rank {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: #eff6ff;
+        color: #000080;
+        font-weight: 700;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .rank-1 {
+        background: #facc15;
+        color: #111827;
+    }
+
+    .rank-2 {
+        background: #d1d5db;
+        color: #111827;
+    }
+
+    .rank-3 {
+        background: #fb923c;
+        color: #111827;
+    }
+
+    .player-value {
+        font-size: 15px;
+        font-weight: 700;
+        color: #000080;
+    }
+
+    /* --- History strip --- */
+    .history-strip {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .hist-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        background: #f8fafc;
+        transition: all .25s;
+        text-decoration: none;
+    }
+
+    .hist-chip:hover {
+        background: #eff6ff;
+        border-color: #000080;
+        color: #000080;
+    }
+
+    .hist-chip.active-chip {
+        background: #000080;
+        border-color: #000080;
+        color: #fff;
+    }
+
+    .hist-chip img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+        border-radius: 3px;
+    }
+
+    /* --- Final Result Card --- */
+    .final-result-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 20px;
+        padding: 28px;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .final-result-card::before {
+        content: "";
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(250, 204, 21, .08) 0%, transparent 70%);
+        top: -60px;
+        right: -40px;
+        pointer-events: none;
+    }
+
+    .vs-badge {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(250, 204, 21, .15);
+        border: 2px solid rgba(250, 204, 21, .3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 14px;
+        color: #facc15;
+        flex-shrink: 0;
+    }
+
+    .finalist-logo {
+        width: 56px;
+        height: 56px;
+        background: rgba(255, 255, 255, .9);
+        border-radius: 14px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .finalist-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    /* --- Season Overview Strip --- */
+    .season-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+    }
+
+    .strip-item {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 20px 16px;
+        text-align: center;
+        transition: all .3s ease;
+    }
+
+    .strip-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .06);
+    }
+
+    .strip-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin: 0 auto 10px;
+    }
+
+    /* --- Title Count Badge --- */
+    .title-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(250, 204, 21, .15);
+        border: 1px solid rgba(250, 204, 21, .3);
+        color: #facc15;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    /* --- Section Header --- */
+    .section-label {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .8px;
+        color: #64748b;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e5e7eb;
+    }
+
+    /* --- Scrollbar --- */
+    .year-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .year-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    .year-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .year-scroll::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 992px) {
+        .champ-hero {
+            padding: 32px 24px;
+        }
+
+        .team-logo-wrap {
+            width: 90px;
+            height: 90px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .champ-hero {
+            padding: 28px 20px;
+        }
+
+        .team-logo-wrap {
+            width: 76px;
+            height: 76px;
+        }
+
+        .final-result-card .d-flex {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="container-xl py-4">
+
+    <!-- =====================================================
+         TOP ROW: Hero Banner  |  Year Selector Sidebar
+    ===================================================== -->
+    <div class="row g-4 mb-4">
+
+        <!-- LEFT: Hero banner -->
+        <div class="col-lg-8">
+            <div class="champ-hero h-100">
+                <div class="hero-glow"></div>
+
+                <div class="position-relative">
+                    <!-- Badge -->
+                    <div class="champ-badge">
+                        <i class="fa-solid fa-trophy" style="color:#facc15;"></i>
+                        IPL CHAMPIONS
+                        <span class="year-pill">{{ champion.year }}</span>
+                    </div>
+
+                    <!-- Team identity row -->
+                    <div class="d-flex align-items-center gap-4 mb-4 flex-wrap">
+                        <div class="team-logo-wrap">
+                            <img src="{{ url_for('static', filename='images/' + champion.logo) }}"
+                                alt="{{ champion.team }}">
+                        </div>
+                        <div>
+                            <p class="mb-1 opacity-75 fw-semibold" style="font-size:13px; letter-spacing:1px;">
+                                {{ champion.year }} CHAMPIONS
+                            </p>
+                            <h1 class="fw-extrabold mb-2 text-white"
+                                style="font-size: clamp(1.6rem, 4vw, 2.8rem); line-height:1.15;">
+                                {{ champion.team }}
+                            </h1>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill"
+                                    style="font-size:15px;">{{ champion.short }}</span>
+                                {% if champion.title_count > 1 %}
+                                <span class="title-badge">
+                                    <i class="fa-solid fa-crown"></i>
+                                    {{ champion.title_count }}× Champions
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick record pills -->
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <div class="hero-record-pill">
+                            <span style="font-size:22px; font-weight:800;">{{ champion.matches }}</span>
+                            <span
+                                style="font-size:11px; opacity:.75; text-transform:uppercase; letter-spacing:.5px;">Matches</span>
+                        </div>
+                        <div class="hero-record-pill">
+                            <span style="font-size:22px; font-weight:800;">{{ champion.wins }}</span>
+                            <span
+                                style="font-size:11px; opacity:.75; text-transform:uppercase; letter-spacing:.5px;">Wins</span>
+                        </div>
+                        <div class="hero-record-pill">
+                            <span style="font-size:22px; font-weight:800;">{{ champion.losses }}</span>
+                            <span
+                                style="font-size:11px; opacity:.75; text-transform:uppercase; letter-spacing:.5px;">Losses</span>
+                        </div>
+                        <div class="hero-record-pill">
+                            <span style="font-size:22px; font-weight:800;">{{ champion.win_pct }}%</span>
+                            <span
+                                style="font-size:11px; opacity:.75; text-transform:uppercase; letter-spacing:.5px;">Win
+                                %</span>
+                        </div>
+                    </div>
+
+                    <!-- Runner-up & Final info -->
+                    {% if champion.runner_up and champion.runner_up != "-" %}
+                    <div style="border-top:1px solid rgba(255,255,255,.15); padding-top:18px;">
+                        <div class="d-flex flex-wrap gap-4 align-items-center">
+                            <div>
+                                <span class="opacity-75 me-1" style="font-size:13px;">
+                                    <i class="fa-solid fa-medal me-1" style="color:#d1d5db;"></i>Runner-up:
+                                </span>
+                                <span class="fw-bold">{{ champion.runner_up }}</span>
+                            </div>
+                            {% if champion.final_mom and champion.final_mom != "-" %}
+                            <div>
+                                <span class="opacity-75 me-1" style="font-size:13px;">
+                                    <i class="fa-solid fa-star me-1" style="color:#facc15;"></i>Man of the Match:
+                                </span>
+                                <span class="fw-bold">{{ champion.final_mom }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if champion.final_margin and champion.final_margin != "-" %}
+                        <div class="mt-2 opacity-75" style="font-size:13px;">
+                            <i class="fa-solid fa-location-dot me-1"></i>
+                            {{ champion.final_venue }} · Won by {{ champion.final_margin }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Year Selector -->
+        <div class="col-lg-4">
+            <div class="year-selector-wrap h-100">
+                <h6 class="fw-bold text-dark mb-3"
+                    style="font-size:13px; letter-spacing:.5px; text-transform:uppercase;">
+                    <i class="fa-solid fa-calendar-days text-primary me-2"></i>Select Season
+                </h6>
+                <div class="year-scroll" style="max-height: 420px; overflow-y: auto; padding-right: 4px;">
+                    <div class="d-flex flex-column gap-2">
+                        {% for y in all_years %}
+                        {% set s = all_seasons | selectattr("year", "equalto", y) | first %}
+                        <a href="{{ url_for('champions', year=y) }}"
+                            class="year-btn {% if y == champion.year %}active-year{% endif %}">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="{{ url_for('static', filename='images/' + s.logo) }}" alt="{{ s.short }}"
+                                    class="year-logo">
+                                <span>{{ y }} — {{ s.short }}</span>
+                            </div>
+                            {% if y == champion.year %}
+                            <i class="fa-solid fa-crown" style="color:#facc15; font-size:13px;"></i>
+                            {% else %}
+                            <i class="fa-solid fa-chevron-right opacity-40" style="font-size:11px;"></i>
+                            {% endif %}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /top row -->
+
+    <!-- =====================================================
+         FINAL RESULT CARD
+    ===================================================== -->
+    {% if champion.runner_up and champion.runner_up != "-" %}
+    <div class="final-result-card mb-4">
+        <div class="d-flex align-items-center justify-content-center gap-4 flex-wrap position-relative">
+            <!-- Winner -->
+            <div class="d-flex align-items-center gap-3">
+                <div class="finalist-logo">
+                    <img src="{{ url_for('static', filename='images/' + champion.logo) }}" alt="{{ champion.team }}">
+                </div>
+                <div>
+                    <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; opacity:.6;">Winner</div>
+                    <div class="fw-bold" style="font-size:18px;">{{ champion.team }}</div>
+                </div>
+            </div>
+
+            <!-- VS -->
+            <div class="vs-badge">VS</div>
+
+            <!-- Runner-up -->
+            <div class="d-flex align-items-center gap-3">
+                <div class="finalist-logo">
+                    <img src="{{ url_for('static', filename='images/' + champion.runner_up_logo) }}"
+                        alt="{{ champion.runner_up }}">
+                </div>
+                <div>
+                    <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; opacity:.6;">Runner-up
+                    </div>
+                    <div class="fw-bold" style="font-size:18px;">{{ champion.runner_up }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% if champion.final_margin and champion.final_margin != "-" %}
+        <div class="text-center mt-3" style="font-size:13px; opacity:.7;">
+            <i class="fa-solid fa-location-dot me-1"></i> {{ champion.final_venue }}
+            · <i class="fa-solid fa-trophy me-1" style="color:#facc15;"></i> Won by {{ champion.final_margin }}
+            {% if champion.final_mom and champion.final_mom != "-" %}
+            · <i class="fa-solid fa-star me-1" style="color:#facc15;"></i> MOM: {{ champion.final_mom }}
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- =====================================================
+         SEASON OVERVIEW STRIP
+    ===================================================== -->
+    <div class="section-label">
+        <i class="fa-solid fa-chart-pie"></i> Season {{ champion.year }} Overview
+    </div>
+    <div class="season-strip mb-4">
+        <div class="strip-item">
+            <div class="strip-icon" style="background:#eff6ff; color:#000080;">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div style="font-size:24px; font-weight:800; color:#0f172a;">{{ season_overview.total_matches }}</div>
+            <div class="text-muted" style="font-size:12px; font-weight:500;">Total Matches</div>
+        </div>
+        <div class="strip-item">
+            <div class="strip-icon" style="background:#f0fdf4; color:#16a34a;">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div style="font-size:24px; font-weight:800; color:#0f172a;">{{ season_overview.total_runs }}</div>
+            <div class="text-muted" style="font-size:12px; font-weight:500;">Total Runs</div>
+        </div>
+        <div class="strip-item">
+            <div class="strip-icon" style="background:#fff1f2; color:#e11d48;">
+                <i class="fa-solid fa-circle"></i>
+            </div>
+            <div style="font-size:24px; font-weight:800; color:#0f172a;">{{ season_overview.total_sixes }}</div>
+            <div class="text-muted" style="font-size:12px; font-weight:500;">Sixes Hit</div>
+        </div>
+        <div class="strip-item">
+            <div class="strip-icon" style="background:#fffbeb; color:#f59e0b;">
+                <i class="fa-solid fa-diamond"></i>
+            </div>
+            <div style="font-size:24px; font-weight:800; color:#0f172a;">{{ season_overview.total_fours }}</div>
+            <div class="text-muted" style="font-size:12px; font-weight:500;">Fours Hit</div>
+        </div>
+        <div class="strip-item">
+            <div class="strip-icon" style="background:#fff7ed; color:#ea580c;">
+                <i class="fa-solid fa-hat-cowboy"></i>
+            </div>
+            <div style="font-size:16px; font-weight:800; color:#0f172a; line-height:1.2;">{{
+                season_overview.orange_cap.name }}</div>
+            <div class="text-muted" style="font-size:12px; font-weight:500;">Orange Cap</div>
+            <div style="font-size:13px; font-weight:700; color:#ea580c;">{{ season_overview.orange_cap.runs }} runs
+            </div>
+        </div>
+        <div class="strip-item">
+            <div class="strip-icon" style="background:#faf5ff; color:#9333ea;">
+                <i class="fa-solid fa-hat-wizard"></i>
+            </div>
+            <div style="font-size:16px; font-weight:800; color:#0f172a; line-height:1.2;">{{
+                season_overview.purple_cap.name }}</div>
+            <div class="text-muted" style="font-size:12px; font-weight:500;">Purple Cap</div>
+            <div style="font-size:13px; font-weight:700; color:#9333ea;">{{ season_overview.purple_cap.wickets }} wkts
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         STAT BLOCKS: Batting & Bowling
+    ===================================================== -->
+
+    <!-- Batting Stats -->
+    <div class="section-label">
+        <i class="fa-solid fa-baseball-bat-ball"></i>
+        Batting Performance – {{ champion.team }} ({{ champion.year }})
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-4 g-3 mb-4">
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#eff6ff; color:#000080;">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ batting.total_runs }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Total Runs</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#f0fdf4; color:#16a34a;">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ batting.run_rate }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Run Rate</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#fefbeb; color:#d97706;">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ batting.highest_total }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Highest Total</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#ecfeff; color:#0891b2;">
+                    <i class="fa-solid fa-arrow-trend-down"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ batting.lowest_total }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Lowest Total</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#fdf4ff; color:#9333ea;">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div style="font-size:20px; font-weight:800; color:#0f172a; line-height:1.2;">
+                    {{ batting.top_batsman }}
+                </div>
+                <div class="text-muted" style="font-size:12px; font-weight:500;">Top Batsman</div>
+                <div class="text-primary fw-bold" style="font-size:13px;">{{ batting.top_batsman_runs }} runs</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#fff1f2; color:#e11d48;">
+                    <i class="fa-solid fa-circle"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ batting.sixes }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Sixes Hit</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#fffbeb; color:#f59e0b;">
+                    <i class="fa-solid fa-diamond"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ batting.fours }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Fours Hit</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bowling Stats -->
+    <div class="section-label">
+        <i class="fa-solid fa-bullseye"></i>
+        Bowling Performance – {{ champion.team }} ({{ champion.year }})
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-4 g-3 mb-5">
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#fff1f2; color:#e11d48;">
+                    <i class="fa-solid fa-fire"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ bowling.wickets }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Wickets Taken</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#eff6ff; color:#000080;">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ bowling.economy }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Economy Rate</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#f0fdf4; color:#16a34a;">
+                    <i class="fa-solid fa-chart-bar"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ bowling.average }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Bowling Avg</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#ecfeff; color:#0891b2;">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ bowling.dot_pct }}%</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Dot Ball %</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#fdf4ff; color:#9333ea;">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div style="font-size:20px; font-weight:800; color:#0f172a; line-height:1.2;">
+                    {{ bowling.top_bowler }}
+                </div>
+                <div class="text-muted" style="font-size:12px; font-weight:500;">Top Bowler</div>
+                <div class="text-danger fw-bold" style="font-size:13px;">{{ bowling.top_bowler_wickets }} wkts</div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-block">
+                <div class="stat-icon-box" style="background:#fefbeb; color:#d97706;">
+                    <i class="fa-solid fa-stopwatch"></i>
+                </div>
+                <div style="font-size:28px; font-weight:800; color:#0f172a;">{{ bowling.strike_rate }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;">Bowling SR</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+         TOP PERFORMERS ACROSS ALL TEAMS (that season)
+    ===================================================== -->
+    <div class="section-label">
+        <i class="fa-solid fa-ranking-star"></i> Top Performers — {{ champion.year }} Season
+    </div>
+
+    <div class="row g-4 mb-5">
+
+        <!-- Top Run Scorers -->
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <h4>
+                    <i class="fa-solid fa-ranking-star text-warning me-2"></i>
+                    Top Run Scorers — {{ champion.year }}
+                </h4>
+                {% for p in top_run_scorers %}
+                <div class="player-row">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="player-rank rank-{{ loop.index }}">{{ loop.index }}</span>
+                        <span class="fw-semibold text-dark" style="font-size:14px;">{{ p.name }}</span>
+                    </div>
+                    <span class="player-value">{{ p.runs }} <span class="text-muted fw-normal"
+                            style="font-size:12px;">runs</span></span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Top Wicket Takers -->
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <h4>
+                    <i class="fa-solid fa-skull-crossbones text-danger me-2"></i>
+                    Top Wicket Takers — {{ champion.year }}
+                </h4>
+                {% for p in top_wicket_takers %}
+                <div class="player-row">
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="player-rank rank-{{ loop.index }}">{{ loop.index }}</span>
+                        <span class="fw-semibold text-dark" style="font-size:14px;">{{ p.name }}</span>
+                    </div>
+                    <span class="player-value" style="color:#e11d48;">{{ p.wickets }} <span class="text-muted fw-normal"
+                            style="font-size:12px;">wkts</span></span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+         ALL SEASONS HISTORY STRIP
+    ===================================================== -->
+    <div class="section-card mb-4">
+        <h4 style="font-size:16px;">
+            <i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>
+            All IPL Champions — Hall of Fame
+        </h4>
+        <div class="history-strip">
+            {% for s in all_seasons %}
+            <a href="{{ url_for('champions', year=s.year) }}"
+                class="hist-chip {% if s.year == champion.year %}active-chip{% endif %}">
+                <img src="{{ url_for('static', filename='images/' + s.logo) }}" alt="{{ s.short }}">
+                <span>{{ s.year }}</span>
+                <span class="fw-normal opacity-75">{{ s.short }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+</div><!-- /container -->
+
+{% endblock %}

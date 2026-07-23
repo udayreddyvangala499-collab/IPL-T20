@@ -1,0 +1,143 @@
+/* ==========================================
+HERO SECTION
+========================================== */
+
+.hero-section {
+    padding: 120px 20px 80px;
+    text-align: center;
+    background-color: #ffffff; /* White background */
+    font-family: 'Inter', sans-serif;
+}
+
+/* Badge Styling */
+.hero-badge-blue {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2ff; /* Very light blue */
+    color: #3b82f6; /* Blue text */
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+/* Typography */
+.hero-title {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #0f172a; /* Dark navy/black */
+    max-width: 900px;
+    margin: 0 auto;
+    letter-spacing: -1.5px;
+}
+
+.text-blue {
+    color: #1d4ed8; /* Strong primary blue */
+}
+
+.hero-subtitle {
+    max-width: 760px;
+    margin: 24px auto 35px;
+    color: #64748b; /* Medium slate */
+    font-size: 20px;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+/* Buttons */
+.hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.btn-primary-blue {
+    background-color: #1d4ed8;
+    color: #ffffff;
+    padding: 14px 32px;
+    border-radius: 8px; /* Slightly squarer than before, matching image */
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary-blue:hover {
+    background-color: #1e40af;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+}
+
+.btn-outline-blue {
+    background-color: #ffffff;
+    color: #1d4ed8;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid #1d4ed8; /* Blue border */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-outline-blue:hover {
+    background-color: #eff6ff;
+    color: #1e40af;
+    border-color: #1e40af;
+    transform: translateY(-1px);
+}
+
+@media(max-width: 768px) {
+    .hero-title {
+        font-size: 36px;
+        letter-spacing: -1px;
+    }
+    .hero-subtitle {
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 16px auto 24px;
+    }
+    .hero-section {
+        padding: 60px 16px 50px;
+    }
+    .hero-badge-blue {
+        font-size: 12px;
+        padding: 5px 14px;
+        margin-bottom: 16px;
+    }
+}
+
+@media(max-width: 576px) {
+    .hero-title {
+        font-size: 28px;
+        letter-spacing: -0.5px;
+    }
+    .hero-subtitle {
+        font-size: 15px;
+    }
+    .hero-section {
+        padding: 50px 12px 40px;
+    }
+    .hero-actions {
+        flex-direction: column;
+    }
+    .btn-primary-blue, .btn-outline-blue {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 24px;
+        font-size: 15px;
+    }
+}

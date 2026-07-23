@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}
+About
+{% endblock %}
+
+{% block content %}
+
+<!-- Custom CSS for About page -->
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, #071330 0%, #000080 50%, #081229 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 40px rgba(0, 0, 128, 0.12);
+        position: relative;
+    }
+    .hero-bg-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
+        background-size: 24px 24px;
+        opacity: 0.7;
+    }
+    .stat-card-modern {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 24px 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        height: 100%;
+    }
+    .stat-card-modern:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0, 0, 128, 0.06);
+        border-color: #2563eb;
+    }
+    .feature-card-modern {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 30px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    }
+    .feature-card-modern:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 30px rgba(0, 0, 128, 0.08);
+        border-color: rgba(37, 99, 235, 0.3);
+    }
+    .icon-box {
+        width: 55px;
+        height: 55px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    .feature-card-modern:hover .icon-box {
+        transform: scale(1.1) rotate(5deg);
+    }
+    .tech-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 20px 10px;
+        transition: all 0.3s ease;
+        height: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.01);
+    }
+    .tech-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+        border-color: #2563eb;
+    }
+    .tech-icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+    }
+    .tech-card:hover .tech-icon {
+        transform: scale(1.15);
+    }
+    .purpose-section {
+        background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .purpose-section::before {
+        content: '"';
+        position: absolute;
+        right: 40px;
+        bottom: -50px;
+        font-size: 200px;
+        color: rgba(37, 99, 235, 0.04);
+        font-family: serif;
+        font-weight: bold;
+        line-height: 1;
+        pointer-events: none;
+    }
+</style>
+
+<div class="container-xl py-5">
+    
+    <!-- Hero Header Card -->
+    <div class="about-hero mb-5 text-center p-5 rounded-4 position-relative overflow-hidden">
+        <div class="hero-bg-overlay"></div>
+        <div class="hero-content position-relative z-index-2 text-white py-3">
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3">
+                <i class="fa-solid fa-circle-info me-1"></i> IPL ANALYTICS PORTAL
+            </span>
+            <h1 class="display-4 fw-extrabold mb-3 text-white">About IPL Analytics Dashboard</h1>
+            <p class="lead text-white-50 mx-auto" style="max-width: 750px;">
+                A comprehensive, data-driven sports analytics platform delivering deep insights into historical teams, player careers, venue records, and head-to-head cricket rivalries.
+            </p>
+        </div>
+    </div>
+
+    <!-- Overview and Statistics Row -->
+    <div class="row g-4 mb-5">
+        <!-- Left: Project Overview -->
+        <div class="col-lg-7">
+            <div class="card border-0 h-100 p-4 shadow-sm rounded-4 position-relative overflow-hidden" style="background: #ffffff; border-left: 5px solid #000080 !important;">
+                <div class="card-body d-flex flex-column justify-content-center py-2">
+                    <h3 class="fw-bold mb-4 text-dark d-flex align-items-center">
+                        <i class="fa-solid fa-circle-nodes text-primary me-2"></i> Project Overview
+                    </h3>
+                    <p class="lead text-secondary mb-3" style="line-height: 1.8; font-size: 1.08rem;">
+                        The <strong>IPL Analytics Dashboard</strong> is a high-performance web application designed to bring you the deepest possible insights from the Indian Premier League (IPL).
+                    </p>
+                    <p class="text-secondary mb-3" style="line-height: 1.8;">
+                        By parsing raw match dataset histories, the platform transforms complex cricket records into interactive graphs, statistics, and metrics.
+                    </p>
+                    <p class="text-secondary mb-0" style="line-height: 1.8;">
+                        Whether you want to analyze batting strike rates, bowling averages, stadium trends, or inspect H2H matches, the application offers an intuitive interface tailored for cricket enthusiasts, analysts, and researchers alike.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right: Live Stats Showcase -->
+        <div class="col-lg-5">
+            <div class="row g-3 h-100">
+                <div class="col-6">
+                    <div class="stat-card-modern">
+                        <div class="text-primary mb-2" style="font-size: 28px;">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <h3 class="fw-extrabold text-dark mb-1">{{ total_seasons }}</h3>
+                        <p class="text-muted small fw-medium mb-0">IPL Seasons</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="stat-card-modern">
+                        <div class="text-success mb-2" style="font-size: 28px;">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <h3 class="fw-extrabold text-dark mb-1">{{ total_matches }}</h3>
+                        <p class="text-muted small fw-medium mb-0">Matches Analyzed</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="stat-card-modern">
+                        <div class="text-warning mb-2" style="font-size: 28px;">
+                            <i class="fa-solid fa-users-viewfinder"></i>
+                        </div>
+                        <h3 class="fw-extrabold text-dark mb-1">{{ total_players }}</h3>
+                        <p class="text-muted small fw-medium mb-0">Players Profiled</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="stat-card-modern">
+                        <div class="text-info mb-2" style="font-size: 28px;">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                        </div>
+                        <h3 class="fw-extrabold text-dark mb-1">{{ total_venues }}</h3>
+                        <p class="text-muted small fw-medium mb-0">Venues Covered</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Features Section -->
+    <div class="mb-5">
+        <h3 class="fw-bold mb-4 text-center text-dark">
+            <i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i> Key Platform Features
+        </h3>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            
+            <div class="col">
+                <div class="feature-card-modern">
+                    <div class="icon-box text-primary" style="background: #eff6ff;">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-3">Team Analytics</h5>
+                    <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                        Analyze team performance, winning trends, venue-specific records, and season-by-season statistics.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="feature-card-modern">
+                    <div class="icon-box text-success" style="background: #f0fdf4;">
+                        <i class="fa-solid fa-user-ninja"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-3">Player Statistics</h5>
+                    <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                        Detailed profile pages for batsmen and bowlers showing matches, strike rates, economy, and dismissals.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="feature-card-modern">
+                    <div class="icon-box text-warning" style="background: #fefbeb;">
+                        <i class="fa-solid fa-code-compare"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-3">Head-to-Head</h5>
+                    <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                        Side-by-side rivalry analysis, head-to-head records, win margin details, and historical comparisons.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="feature-card-modern">
+                    <div class="icon-box text-info" style="background: #ecfeff;">
+                        <i class="fa-solid fa-chart-column"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-3">Match Insights</h5>
+                    <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                        Venue performance logs, average scores, toss impact, decision trends, and match results.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Tech Stack Section -->
+    <div class="mb-5">
+        <h3 class="fw-bold mb-4 text-center text-dark">
+            <i class="fa-solid fa-gears text-primary me-2"></i> Technology Stack
+        </h3>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3 justify-content-center">
+            
+            <div class="col">
+                <div class="tech-card text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="tech-icon" style="color: #3776AB;">
+                        <i class="fa-brands fa-python"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1 text-dark">Python</h6>
+                    <span class="text-muted small">Programming Language</span>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="tech-card text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="tech-icon" style="color: #000000;">
+                        <i class="fa-solid fa-flask"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1 text-dark">Flask</h6>
+                    <span class="text-muted small">Web Framework</span>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="tech-card text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="tech-icon" style="color: #150458;">
+                        <i class="fa-solid fa-table"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1 text-dark">Pandas</h6>
+                    <span class="text-muted small">Data Manipulation</span>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="tech-card text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="tech-icon" style="color: #E34F26;">
+                        <i class="fa-brands fa-html5"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1 text-dark">HTML5</h6>
+                    <span class="text-muted small">Markup Structure</span>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="tech-card text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="tech-icon" style="color: #1572B6;">
+                        <i class="fa-brands fa-css3-alt"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1 text-dark">CSS3</h6>
+                    <span class="text-muted small">Custom Styling</span>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="tech-card text-center d-flex flex-column align-items-center justify-content-center">
+                    <div class="tech-icon" style="color: #563D7C;">
+                        <i class="fa-brands fa-bootstrap"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1 text-dark">Bootstrap 5</h6>
+                    <span class="text-muted small">Responsive Grid</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Purpose / Quote Section -->
+    <div class="purpose-section p-4 p-md-5 mb-4 shadow-sm">
+        <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-lightbulb text-warning me-2"></i>Our Purpose</h4>
+        <p class="text-secondary mb-0 lead" style="line-height: 1.8; max-width: 95%; font-size: 1.05rem;">
+            This dashboard was developed to demonstrate the practical application of sports data analytics. By integrating robust data science workflows with modern front-end engineering, we aim to deliver an accessible repository of IPL history, allowing everyone from casual fans to analytical developers to make sense of the match statistics and performance trends.
+        </p>
+    </div>
+
+</div>
+
+{% endblock %}
